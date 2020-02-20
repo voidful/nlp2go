@@ -63,13 +63,13 @@ def make_app() -> Flask:
 def main():
     global model_dict
     model_dict = defaultdict(dict)
-    parser = argparse.ArgumentParser(description='Serve up a simple model')
+    parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--json', type=str)
     group.add_argument('--model', type=str)
     parser.add_argument('--predictor', type=str, choices=['tag', 'biotag'])
     parser.add_argument('--path', type=str, default="API", help='api path to serve the demo')
-    parser.add_argument('--port', type=int, default=3010, help='port to serve the demo on')
+    parser.add_argument('--port', type=int, default=8022, help='port to serve the demo on')
     args = parser.parse_args()
 
     if args.model:
@@ -77,11 +77,13 @@ def main():
         model.load_model(args.model)
         model_detail = {'model': model, 'predictor': args.predictor}
         model_dict[args.path].update(model_detail)
-
-        model2 = Model()
-        model2.load_model(args.model)
-        model_detail2 = {'model': model, 'predictor': 'tag'}
-        model_dict[args.path + "2"].update(model_detail2)
+    else:
+        with open(args.json, 'r', encoding='utf8') as reader:
+            model_dict = json.loads(reader.read())
+        for k, v in model_dict.items():
+            model = Model()
+            model.load_model(model_dict[k]['model'])
+            model_dict[k]['model'] = model
 
     print("hosting api in path: ", list(model_dict.keys()))
     app = make_app()
