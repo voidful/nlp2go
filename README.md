@@ -1,4 +1,4 @@
-# NLP2GO - hosting nlp models for demo purpose
+# nlp2go - hosting nlp models for demo purpose
 
 ## Example
 hosting single model

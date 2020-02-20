@@ -67,7 +67,7 @@ def main():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--json', type=str)
     group.add_argument('--model', type=str)
-    parser.add_argument('--predictor', type=str, choices=['tag', 'biotag'])
+    parser.add_argument('--predictor', type=str, choices=['tag', 'biotag', 'default'])
     parser.add_argument('--path', type=str, default="API", help='api path to serve the demo')
     parser.add_argument('--port', type=int, default=8022, help='port to serve the demo on')
     args = parser.parse_args()

@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import nlp2
 import tfkit
 import torch
@@ -39,13 +41,19 @@ class Model:
         self.type = type
 
     def predict(self, input, predictor):
-        results = ""
-        results_map = []
-        for i in nlp2.sliding_windows(nlp2.spilt_sentence_to_array(input, True), self.maxlen - 10):
-            input = " ".join(i)
-            result, outprob = self.model.predict(input)
-            results += result
-            results_map.extend(outprob)
+        results = defaultdict(list)
+        results_map = defaultdict(list)
+        if 'classify' in self.type:
+            tasks = list(self.model.tasks_detail.keys())
+        else:
+            tasks = ['default']
+
+        for task in tasks:
+            for i in nlp2.sliding_windows(nlp2.spilt_sentence_to_array(input, True), self.maxlen - 10):
+                input = " ".join(i)
+                result, outprob = self.model.predict(input=input, task=task)
+                results[task] += result
+                results_map[task].extend(outprob)
 
         if predictor == 'biotag':
             result_dict = self.biotag2json(results, results_map)
@@ -63,43 +71,52 @@ class Model:
         }
         return result_dict
 
-    def tag2json(self, result, map):
+    def tag2json(self, results, maps):
         result_dict = {
-            'result': result,
-            'tags': [],
-            'result_map': map
+            'result': results,
+            'tags': defaultdict(list),
+            'result_map': maps
         }
+        for task, result in results.items():
+            results[task] = "".join(result)
+
         word_str = ""
-        for i in map:
-            k = list(i.keys())[0]
-            v = list(i.values())[0]
-            if v is not "O":
-                word_str += k
-            elif len(word_str) > 0:
-                result_dict['tags'].append(word_str)
-                word_str = ""
+        for task, map in maps.items():
+            for i in map:
+                k = list(i.keys())[0]
+                v = list(i.values())[0]
+                if v is not "O":
+                    word_str += k
+                elif len(word_str) > 0:
+                    result_dict['tags'][task].append(word_str)
+                    word_str = ""
 
         return result_dict
 
-    def biotag2json(self, result, map):
+    def biotag2json(self, results, maps):
         result_dict = {
-            'result': result,
-            'tags': {},
-            'result_map': map
+            'result': results,
+            'tags': defaultdict(dict),
+            'result_map': maps
         }
+
+        for task, result in results.items():
+            results[task] = "".join(result)
+
         word_str = ""
         word_type = ""
-        for i in map:
-            k = list(i.keys())[0]
-            v = list(i.values())[0]
-            if "B" in v and len(word_str) > 0:
-                result_dict['tags'][word_str] = word_type
-                word_str = ""
-            if v is not "O":
-                word_str += k
-                word_type = v.split("_")[1]
-            elif len(word_str) > 0:
-                result_dict['tags'][word_str] = word_type
-                word_str = ""
+        for task, map in maps.items():
+            for i in map:
+                k = list(i.keys())[0]
+                v = list(i.values())[0]
+                if "B" in v and len(word_str) > 0:
+                    result_dict['tags'][task][word_str] = word_type
+                    word_str = ""
+                if v is not "O":
+                    word_str += k
+                    word_type = v.split("_")[1]
+                elif len(word_str) > 0:
+                    result_dict['tags'][task][word_str] = word_type
+                    word_str = ""
 
         return result_dict
