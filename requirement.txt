@@ -1,3 +1,4 @@
 nlp2
 tfkit
 flask
+flask-cors
