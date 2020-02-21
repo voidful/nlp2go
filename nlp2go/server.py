@@ -48,7 +48,7 @@ def make_app() -> Flask:
     global model_dict
     app = Flask(__name__)  # pylint: disable=invalid-name
 
-    @app.route('/<path>', methods=['POST'])
+    @app.route('/api/<path>', methods=['GET', 'POST'])
     def predict(path) -> Response:
         if "input" in request.values and path in model_dict:
             input = request.values["input"]
@@ -95,7 +95,7 @@ def main():
                 result = v['model'].predict(model_input, v.get('predictor', 'just'))
                 print(json.dumps(result, ensure_ascii=False, cls=NumpyEncoder, indent=4, sort_keys=True))
     else:
-        print("hosting api in path: ", list(model_dict.keys()))
+        print("hosting api in path: /api/+", list(model_dict.keys()))
         app = make_app()
         CORS(app)
 
