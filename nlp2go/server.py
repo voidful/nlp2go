@@ -53,7 +53,7 @@ def make_app() -> Flask:
         if "input" in request.values and path in model_dict:
             input = request.values["input"]
             result = model_dict[path]['model'].predict(input, model_dict[path].get('predictor', 'just'))
-            return json.dumps(result, ensure_ascii=False, cls=NumpyEncoder)
+            return json.dumps(result, ensure_ascii=False, cls=NumpyEncoder, indent=4, sort_keys=True)
         else:
             raise ServerError("parameter not found", 404)
 
@@ -70,6 +70,7 @@ def main():
     parser.add_argument('--predictor', type=str, choices=['tag', 'biotag', 'default'])
     parser.add_argument('--path', type=str, default="API", help='api path to serve the demo')
     parser.add_argument('--port', type=int, default=8022, help='port to serve the demo on')
+    parser.add_argument('--cli', action='store_true', help='commandline mode')
     args = parser.parse_args()
 
     if args.model:
@@ -85,13 +86,22 @@ def main():
             model.load_model(model_dict[k]['model'])
             model_dict[k]['model'] = model
 
-    print("hosting api in path: ", list(model_dict.keys()))
-    app = make_app()
-    CORS(app)
+    if args.cli:
+        while True:
+            model_input = input('Enter your input:')
+            if len(model_input.strip()) < 1:
+                break
+            for k, v in model_dict.items():
+                result = v['model'].predict(model_input, v.get('predictor', 'just'))
+                print(json.dumps(result, ensure_ascii=False, cls=NumpyEncoder, indent=4, sort_keys=True))
+    else:
+        print("hosting api in path: ", list(model_dict.keys()))
+        app = make_app()
+        CORS(app)
 
-    http_server = WSGIServer(('0.0.0.0', args.port), app)
-    print(f"Model loaded, serving demo on port {args.port}")
-    http_server.serve_forever()
+        http_server = WSGIServer(('0.0.0.0', args.port), app)
+        print(f"Model loaded, serving demo on port {args.port}")
+        http_server.serve_forever()
 
 
 if __name__ == "__main__":

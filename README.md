@@ -52,8 +52,9 @@ arguments:
 optional arguments:
   -h, --help    show this help message and exit
   --predictor   formatting result on different kind of task    ['biotag', 'tag', 'default']  
-  --path api path
-  --port api hosting port
+  --path        api path
+  --port        api hosting port
+  --cli         command line mode
 ```
 Json file example
 ```json
