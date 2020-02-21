@@ -90,7 +90,8 @@ class Model:
                 elif len(word_str) > 0:
                     result_dict['tags'][task].append(word_str)
                     word_str = ""
-
+        if len(word_str) > 0:
+            result_dict['tags'][task].append(word_str)
         return result_dict
 
     def biotag2json(self, results, maps):
@@ -118,5 +119,7 @@ class Model:
                 elif len(word_str) > 0:
                     result_dict['tags'][task][word_str] = word_type
                     word_str = ""
+        if len(word_str) > 0:
+            result_dict['tags'][task][word_str] = word_type
 
         return result_dict
