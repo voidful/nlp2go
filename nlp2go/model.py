@@ -47,18 +47,26 @@ class Model:
             tasks = list(self.model.tasks_detail.keys())
         else:
             tasks = ['default']
+        sep = self.model.tok_sep(self.model.tokenizer)
 
         for task in tasks:
-            for i in nlp2.sliding_windows(nlp2.spilt_sentence_to_array(input, True), self.maxlen - 10):
-                input = " ".join(i)
+            if sep in input:
                 result, outprob = self.model.predict(input=input, task=task)
                 results[task] += result
                 results_map[task].extend(outprob)
+            else:
+                for i in nlp2.sliding_windows(nlp2.spilt_sentence_to_array(input, True), self.maxlen - 10):
+                    input = " ".join(i)
+                    result, outprob = self.model.predict(input=input, task=task)
+                    results[task] += result
+                    results_map[task].extend(outprob)
 
         if predictor == 'biotag':
             result_dict = self.biotag2json(results, results_map)
         elif predictor == 'tag':
             result_dict = self.tag2json(results, results_map)
+        elif predictor == 'gen':
+            result_dict = self.gen2json(results, results_map)
         else:
             result_dict = self.just2json(results, results_map)
 
@@ -67,6 +75,15 @@ class Model:
     def just2json(self, result, map):
         result_dict = {
             'result': result,
+            'result_map': map
+        }
+        return result_dict
+
+    def gen2json(self, results, map):
+        for task, result in results.items():
+            results[task] = "".join(result)
+        result_dict = {
+            'result': results,
             'result_map': map
         }
         return result_dict
