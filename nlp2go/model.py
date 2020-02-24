@@ -40,24 +40,30 @@ class Model:
         self.maxlen = maxlen
         self.type = type
 
-    def predict(self, input, predictor):
+    def predict(self, input, predictor, beamsearch=False):
         results = defaultdict(list)
         results_map = defaultdict(list)
+
         if 'classify' in self.type:
             tasks = list(self.model.tasks_detail.keys())
         else:
             tasks = ['default']
-        sep = self.model.tok_sep(self.model.tokenizer)
 
+        if beamsearch and 'onebyone' in self.type:
+            predict_func = self.model.predict_beamsearch
+        else:
+            predict_func = self.model.predict
+
+        sep = tfkit.utility.tok_sep(self.model.tokenizer)
         for task in tasks:
             if sep in input:
-                result, outprob = self.model.predict(input=input, task=task)
+                result, outprob = predict_func(input=input, task=task)
                 results[task] += result
                 results_map[task].extend(outprob)
             else:
                 for i in nlp2.sliding_windows(nlp2.spilt_sentence_to_array(input, True), self.maxlen - 10):
                     input = " ".join(i)
-                    result, outprob = self.model.predict(input=input, task=task)
+                    result, outprob = predict_func(input=input, task=task)
                     results[task] += result
                     results_map[task].extend(outprob)
 

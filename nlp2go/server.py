@@ -52,7 +52,7 @@ def make_app() -> Flask:
     def predict(path) -> Response:
         if "input" in request.values and path in model_dict:
             input = request.values["input"]
-            result = model_dict[path]['model'].predict(input, model_dict[path].get('predictor', 'just'))
+            result = model_dict[path]['model'].predict(input, model_dict[path].get('predictor', 'just'),model_dict[path].get('beamsearch', False))
             return json.dumps(result, ensure_ascii=False, cls=NumpyEncoder, indent=4, sort_keys=True)
         else:
             raise ServerError("parameter not found", 404)
@@ -67,16 +67,17 @@ def main():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--json', type=str)
     group.add_argument('--model', type=str)
-    parser.add_argument('--predictor', type=str, choices=['tag', 'biotag', 'default'])
+    parser.add_argument('--predictor', type=str, choices=['tag', 'biotag','gen', 'default'])
     parser.add_argument('--path', type=str, default="API", help='api path to serve the demo')
     parser.add_argument('--port', type=int, default=8022, help='port to serve the demo on')
     parser.add_argument('--cli', action='store_true', help='commandline mode')
+    parser.add_argument('--beamsearch', action='store_true', help='enable beamsearch in gen model')
     args = parser.parse_args()
 
     if args.model:
         model = Model()
         model.load_model(args.model)
-        model_detail = {'model': model, 'predictor': args.predictor}
+        model_detail = {'model': model, 'predictor': args.predictor,'beamsearch':args.beamsearch}
         model_dict[args.path].update(model_detail)
     else:
         with open(args.json, 'r', encoding='utf8') as reader:
@@ -92,7 +93,7 @@ def main():
             if len(model_input.strip()) < 1:
                 break
             for k, v in model_dict.items():
-                result = v['model'].predict(model_input, v.get('predictor', 'just'))
+                result = v['model'].predict(model_input, v.get('predictor', 'just'), v.get('beamsearch', False))
                 print(json.dumps(result, ensure_ascii=False, cls=NumpyEncoder, indent=4, sort_keys=True))
     else:
         print("hosting api in path: /api/+", list(model_dict.keys()))
