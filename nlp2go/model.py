@@ -33,6 +33,9 @@ class Model:
             model = tfkit.classifier.BertMtClassifier(package['task'], model_config=config)
         elif 'tag' in type:
             model = tfkit.tag.BertTagger(package['label'], model_config=config, maxlen=maxlen)
+        elif 'qa' in type:
+            model = tfkit.qa.BertQA(model_config=config, maxlen=maxlen)
+
         model = model.to(device)
         model.load_state_dict(package['model_state_dict'], strict=False)
 
@@ -73,6 +76,8 @@ class Model:
             result_dict = self.tag2json(results, results_map)
         elif predictor == 'gen':
             result_dict = self.gen2json(results, results_map)
+        elif predictor == 'qa':
+            result_dict = self.qa2json(results, results_map)
         else:
             result_dict = self.just2json(results, results_map)
 
@@ -83,6 +88,16 @@ class Model:
             'result': result,
             'result_map': map
         }
+        return result_dict
+
+    def qa2json(self, results, map):
+        result_dict = {
+            'result': results,
+            'tags': defaultdict(list),
+            'result_map': map
+        }
+        for task, result in results.items():
+            result_dict['tags'][task].append("".join(result))
         return result_dict
 
     def gen2json(self, results, map):
