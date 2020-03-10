@@ -97,7 +97,7 @@ class Model:
             'result_map': map
         }
         for task, result in results.items():
-            result_dict['tags'][task].append("".join(result))
+            result_dict['tags'][task].append("".join(result).replace("#", ""))
         return result_dict
 
     def gen2json(self, results, map):
