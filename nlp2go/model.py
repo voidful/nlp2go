@@ -1,6 +1,4 @@
-from collections import defaultdict
-
-import nlp2
+import re
 import tfkit
 import torch
 
@@ -43,14 +41,14 @@ class Model:
         self.maxlen = maxlen
         self.type = type
 
-    def predict(self, input, predictor, beamsearch=False):
-        results = defaultdict(list)
-        results_map = defaultdict(list)
+    def predict(self, input, beamsearch=False, task=None):
 
         if 'classify' in self.type:
-            tasks = list(self.model.tasks_detail.keys())
+            if task is None:
+                print(list(self.model.tasks_detail))
+                task = list(self.model.tasks_detail)[0]
         else:
-            tasks = ['default']
+            task = 'default'
 
         if beamsearch and 'onebyone' in self.type:
             predict_func = self.model.predict_beamsearch
@@ -58,106 +56,18 @@ class Model:
             predict_func = self.model.predict
 
         sep = tfkit.utility.tok_sep(self.model.tokenizer)
-        for task in tasks:
-            if sep in input:
-                result, outprob = predict_func(input=input, task=task)
-                results[task] += result
-                results_map[task].extend(outprob)
-            else:
-                for i in nlp2.sliding_windows(nlp2.spilt_sentence_to_array(input, True), self.maxlen - 10):
-                    input = " ".join(i)
-                    result, outprob = predict_func(input=input, task=task)
-                    results[task] += result
-                    results_map[task].extend(outprob)
+        sep = sep.replace('[', '\[').replace(']', '\]').replace('<', '\<').replace('>', '\>')
+        regex = r"[0-9]+|[a-zA-Z]+\'*[a-z]*|[\w]" + "|" + sep
+        input = " ".join(re.findall(regex, input, re.UNICODE))
 
-        if predictor == 'biotag':
-            result_dict = self.biotag2json(results, results_map)
-        elif predictor == 'tag':
-            result_dict = self.tag2json(results, results_map)
-        elif predictor == 'gen':
-            result_dict = self.gen2json(results, results_map)
-        elif predictor == 'qa':
-            result_dict = self.qa2json(results, results_map)
-        else:
-            result_dict = self.just2json(results, results_map)
-
+        print(task)
+        result_list, results_dict = predict_func(input=input, task=task)
+        result_dict = self.convert2json(result_list, results_dict)
         return result_dict
 
-    def just2json(self, result, map):
+    def convert2json(self, result, map):
         result_dict = {
             'result': result,
-            'result_map': map
+            'result_info': map
         }
-        return result_dict
-
-    def qa2json(self, results, map):
-        result_dict = {
-            'result': results,
-            'tags': defaultdict(list),
-            'result_map': map
-        }
-        for task, result in results.items():
-            result_dict['tags'][task].append("".join(result).replace("#", ""))
-        return result_dict
-
-    def gen2json(self, results, map):
-        for task, result in results.items():
-            results[task] = "".join(result)
-        result_dict = {
-            'result': results,
-            'result_map': map
-        }
-        return result_dict
-
-    def tag2json(self, results, maps):
-        result_dict = {
-            'result': results,
-            'tags': defaultdict(list),
-            'result_map': maps
-        }
-        for task, result in results.items():
-            results[task] = "".join(result)
-
-        word_str = ""
-        for task, map in maps.items():
-            for i in map:
-                k = list(i.keys())[0]
-                v = list(i.values())[0]
-                if v is not "O":
-                    word_str += k
-                elif len(word_str) > 0:
-                    result_dict['tags'][task].append(word_str)
-                    word_str = ""
-        if len(word_str) > 0:
-            result_dict['tags'][task].append(word_str)
-        return result_dict
-
-    def biotag2json(self, results, maps):
-        result_dict = {
-            'result': results,
-            'tags': defaultdict(dict),
-            'result_map': maps
-        }
-
-        for task, result in results.items():
-            results[task] = "".join(result)
-
-        word_str = ""
-        word_type = ""
-        for task, map in maps.items():
-            for i in map:
-                k = list(i.keys())[0]
-                v = list(i.values())[0]
-                if "B" in v and len(word_str) > 0:
-                    result_dict['tags'][task][word_str] = word_type
-                    word_str = ""
-                if v is not "O":
-                    word_str += k
-                    word_type = v.split("_")[1]
-                elif len(word_str) > 0:
-                    result_dict['tags'][task][word_str] = word_type
-                    word_str = ""
-        if len(word_str) > 0:
-            result_dict['tags'][task][word_str] = word_type
-
         return result_dict
