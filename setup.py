@@ -12,7 +12,7 @@ setup(
     keywords='nlp tfkit classification generation tagging deep learning machine reading',
     packages=find_packages(),
     install_requires=[
-        "tfkit",
+        "tfkit>=0.1.22",
         "flask",
         "flask-cors",
         "gevent"

@@ -52,9 +52,9 @@ def make_app() -> Flask:
     def predict(path) -> Response:
         if "input" in request.values and path in model_dict:
             input = request.values["input"]
-            result = model_dict[path]['model'].predict(input, beamsearch=model_dict[path].get('beamsearch', False),
-                                                       task=model_dict[path].get('task', None))
-            return json.dumps(result, ensure_ascii=False, cls=NumpyEncoder, indent=4, sort_keys=True)
+            result_dict = model_dict[path]['model'].predict(input, model_dict[path])
+            return json.dumps({'result': result_dict['result']}, ensure_ascii=False, cls=NumpyEncoder, indent=4,
+                              sort_keys=True)
         else:
             raise ServerError("parameter not found", 404)
 
@@ -78,8 +78,9 @@ def main():
     if args.model:
         model = Model()
         model.load_model(args.model)
-        model_detail = {'model': model, 'beamsearch': args.beamsearch, 'task': args.task}
+        model_detail = {'model': model}
         model_dict[args.path].update(model_detail)
+        model_dict[args.path].update(vars(args))
     else:
         with open(args.json, 'r', encoding='utf8') as reader:
             model_dict = json.loads(reader.read())
@@ -94,9 +95,8 @@ def main():
             if len(model_input.strip()) < 1:
                 break
             for k, v in model_dict.items():
-                result = v['model'].predict(model_input, beamsearch=v.get('beamsearch', False),
-                                            task=v.get('task', None))
-                print(json.dumps(result, ensure_ascii=False, cls=NumpyEncoder, indent=4, sort_keys=True))
+                result_dict = v['model'].predict(model_input, param_dict=v)
+                print(json.dumps(result_dict['result'], ensure_ascii=False, cls=NumpyEncoder, indent=4, sort_keys=True))
     else:
         print("hosting api in path: /api/+", list(model_dict.keys()))
         app = make_app()

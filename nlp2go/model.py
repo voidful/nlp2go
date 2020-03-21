@@ -41,7 +41,13 @@ class Model:
         self.maxlen = maxlen
         self.type = type
 
-    def predict(self, input, beamsearch=False, task=None):
+    def predict(self, input, param_dict):
+        beamsearch = param_dict.get('beamsearch', False)
+        beamsize = param_dict.get('beamsize', 3)
+        filtersim = param_dict.get('filtersim', True)
+        topP = param_dict.get('topP', 1)
+        topK = param_dict.get('topK', 0.7)
+        task = param_dict.get('task', None)
 
         if 'classify' in self.type:
             if task is None:
@@ -50,18 +56,23 @@ class Model:
         else:
             task = 'default'
 
+        predict_param = {'input': '', 'task': task}
         if beamsearch and 'onebyone' in self.type:
-            predict_func = self.model.predict_beamsearch
-        else:
-            predict_func = self.model.predict
+            predict_param['beamsearch'] = beamsearch
+            predict_param['beamsize'] = beamsize
+            predict_param['filtersim'] = filtersim
+        elif 'onebyone' in self.type:
+            predict_param['topP'] = topP
+            predict_param['topK'] = topK
 
+        predict_func = self.model.predict
         sep = tfkit.utility.tok_sep(self.model.tokenizer)
         sep = sep.replace('[', '\[').replace(']', '\]').replace('<', '\<').replace('>', '\>')
         regex = r"[0-9]+|[a-zA-Z]+\'*[a-z]*|[\w]" + "|" + sep
         input = " ".join(re.findall(regex, input, re.UNICODE))
-
-        print(task)
-        result_list, results_dict = predict_func(input=input, task=task)
+        predict_param['input'] = input
+        predict_param['task'] = task
+        result_list, results_dict = predict_func(**predict_param)
         result_dict = self.convert2json(result_list, results_dict)
         return result_dict
 

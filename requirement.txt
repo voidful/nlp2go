@@ -1,5 +1,5 @@
 nlp2
-tfkit
+tfkit>=0.1.22
 flask
 flask-cors
 gevent
