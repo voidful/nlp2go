@@ -79,8 +79,8 @@ def main():
         model = Model()
         model.load_model(args.model)
         model_detail = {'model': model}
-        model_dict[args.path].update(model_detail)
         model_dict[args.path].update(vars(args))
+        model_dict[args.path].update(model_detail)
     else:
         with open(args.json, 'r', encoding='utf8') as reader:
             model_dict = json.loads(reader.read())
