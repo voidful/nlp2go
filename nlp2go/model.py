@@ -68,7 +68,7 @@ class Model:
         predict_func = self.model.predict
         sep = tfkit.utility.tok_sep(self.model.tokenizer)
         sep = sep.replace('[', '\[').replace(']', '\]').replace('<', '\<').replace('>', '\>')
-        regex = r"[0-9]+|[a-zA-Z]+\'*[a-z]*|[\w]" + "|" + sep
+        regex = r"\[Question\]|[0-9]+|[a-zA-Z]+\'*[a-z]*|[\w\W]" + "|" + sep
         input = " ".join(re.findall(regex, input, re.UNICODE))
         predict_param['input'] = input
         predict_param['task'] = task
