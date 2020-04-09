@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='nlp2go',
-    version='0.0.15',
+    version='0.0.16',
     description='hosting nlp models for demo purpose',
     url='https://github.com/voidful/nlp2go',
     author='Voidful',
@@ -18,7 +18,7 @@ setup(
         "gevent"
     ],
     entry_points={
-        'console_scripts': ['nlp2go=nlp2go.server:main']
+        'console_scripts': ['nlp2go=nlp2go.server:main', 'nlp2go-preload=nlp2go.prep:main']
     },
     zip_safe=False,
 )

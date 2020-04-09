@@ -19,6 +19,7 @@ class Model:
         print("===model info===")
         print("maxlen", maxlen)
         print("type", type)
+        print("config", config)
         print('==========')
 
         if "once" in type:

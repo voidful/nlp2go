@@ -242,3 +242,8 @@ Temporary Items
 .how2
 how2
 /how2
+
+# test cache
+./nlp2go/test/cache
+/nlp2go/test/cache
+nlp2go/test/cache
