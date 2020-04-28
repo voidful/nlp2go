@@ -72,12 +72,15 @@ def main():
     parser.add_argument('--port', type=int, default=8022, help='port to serve the demo on')
     parser.add_argument('--cli', action='store_true', help='commandline mode')
     parser.add_argument('--beamsearch', action='store_true', help='enable beamsearch in gen model')
+    group.add_argument('--type', type=str, default=None, help='which model to use in multi-task',
+                       choices=['once', 'twice', 'onebyone', 'classify', 'tagRow', 'tagCol', 'qa',
+                                'onebyone-neg', 'onebyone-pos', 'onebyone-both', ])
     group.add_argument('--task', type=str, default=None, help='specific classification task')
     args = parser.parse_args()
 
     if args.model:
         model = Model()
-        model.load_model(args.model)
+        model.load_model(args.model, args.type)
         model_detail = {'model': model}
         model_dict[args.path].update(vars(args))
         model_dict[args.path].update(model_detail)
@@ -86,7 +89,7 @@ def main():
             model_dict = json.loads(reader.read())
         for k, v in model_dict.items():
             model = Model()
-            model.load_model(model_dict[k]['model'])
+            model.load_model(model_dict[k]['model'], args.type)
             model_dict[k]['model'] = model
 
     if args.cli:

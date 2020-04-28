@@ -1,6 +1,7 @@
 import re
 import tfkit
 import torch
+from transformers import BertTokenizer, AutoTokenizer, AutoModel
 
 
 class Model:
@@ -8,35 +9,45 @@ class Model:
         self.model = None
         self.maxlen = 512
 
-    def load_model(self, model_path):
+    def load_model(self, model_path, model_type=None):
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
         package = torch.load(model_path, map_location=device)
 
         maxlen = package['maxlen']
-        type = package['type'].lower()
         config = package['model_config'] if 'model_config' in package else package['bert']
+        model_types = [package['type']] if not isinstance(package['type'], list) else package['type']
+        models_state = package['models'] if 'models' in package else [package['model_state_dict']]
 
         print("===model info===")
         print("maxlen", maxlen)
-        print("type", type)
+        print("type", model_types)
         print("config", config)
         print('==========')
 
+        # load pre-train model
+        if 'albert_chinese' in config:
+            tokenizer = BertTokenizer.from_pretrained(config)
+        else:
+            tokenizer = AutoTokenizer.from_pretrained(config)
+        pretrained = AutoModel.from_pretrained(config)
+
+        type = model_types[0] if model_type is None else model_type
+
         if "once" in type:
-            model = tfkit.gen_once.BertOnce(model_config=config, maxlen=maxlen)
+            model = tfkit.gen_once.Once(tokenizer, pretrained, maxlen=maxlen)
         elif "twice" in type:
-            model = tfkit.gen_twice.BertTwice(model_config=config, maxlen=maxlen)
+            model = tfkit.gen_twice.Twice(tokenizer, pretrained, maxlen=maxlen)
         elif "onebyone" in type:
-            model = tfkit.gen_onebyone.BertOneByOne(model_config=config, maxlen=maxlen)
+            model = tfkit.gen_onebyone.OneByOne(tokenizer, pretrained, maxlen=maxlen)
         elif 'classify' in type:
-            model = tfkit.classifier.BertMtClassifier(package['task'], model_config=config)
+            model = tfkit.classifier.MtClassifier(package['task'], tokenizer, pretrained)
         elif 'tag' in type:
-            model = tfkit.tag.BertTagger(package['label'], model_config=config, maxlen=maxlen)
+            model = tfkit.tag.Tagger(package['label'], tokenizer, pretrained, maxlen=maxlen)
         elif 'qa' in type:
-            model = tfkit.qa.BertQA(model_config=config, maxlen=maxlen)
+            model = tfkit.qa.QA(tokenizer, pretrained, maxlen=maxlen)
 
         model = model.to(device)
-        model.load_state_dict(package['model_state_dict'], strict=False)
+        model.load_state_dict(models_state[model_types.index(type)], strict=False)
 
         self.model = model
         self.maxlen = maxlen
