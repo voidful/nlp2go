@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='nlp2go',
-    version='0.0.17',
+    version='0.0.18',
     description='hosting nlp models for demo purpose',
     url='https://github.com/voidful/nlp2go',
     author='Voidful',
@@ -12,7 +12,7 @@ setup(
     keywords='nlp tfkit classification generation tagging deep learning machine reading',
     packages=find_packages(),
     install_requires=[
-        "tfkit>0.2.28",
+        "tfkit>=0.3.10",
         "flask",
         "flask-cors",
         "gevent"

@@ -71,11 +71,17 @@ def main():
     parser.add_argument('--path', type=str, default="API", help='api path to serve the demo')
     parser.add_argument('--port', type=int, default=8022, help='port to serve the demo on')
     parser.add_argument('--cli', action='store_true', help='commandline mode')
-    parser.add_argument('--beamsearch', action='store_true', help='enable beamsearch in gen model')
     group.add_argument('--type', type=str, default=None, help='which model to use in multi-task',
                        choices=['once', 'twice', 'onebyone', 'classify', 'tagRow', 'tagCol', 'qa',
                                 'onebyone-neg', 'onebyone-pos', 'onebyone-both', ])
     group.add_argument('--task', type=str, default=None, help='specific classification task')
+    # for text generation
+    parser.add_argument('--beamsearch', action='store_true', help='enable beamsearch in gen model')
+    parser.add_argument("--beamsize", type=int, default=3)
+    parser.add_argument("--beamfiltersim", action='store_true')
+    parser.add_argument("--topP", type=int, default=1)
+    parser.add_argument("--topK", type=float, default=0.6)
+
     args = parser.parse_args()
 
     if args.model:
