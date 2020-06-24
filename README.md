@@ -1,4 +1,23 @@
-# nlp2go - hosting nlp models for demo purpose
+<p  align="center">
+    <br>
+    <img src="https://raw.githubusercontent.com/voidful/nlp2go/master/doc/img/nlp2go.png" width="400"/>
+    <br>
+<p>
+<br/>
+<p align="center">
+    <a href="https://pypi.org/project/nlp2go/">
+        <img alt="PyPI" src="https://img.shields.io/pypi/v/nlp2go">
+    </a>
+    <a href="https://github.com/voidful/nlp2go">
+        <img alt="Download" src="https://img.shields.io/pypi/dm/nlp2go">
+    </a>
+    <a href="https://github.com/voidful/nlp2go">
+        <img alt="Size" src="https://img.shields.io/github/repo-size/voidful/nlp2go">
+    </a>
+</p>
+<br/>
+
+hosting nlp models in one line
 
 ## Example
 hosting single model
@@ -72,5 +91,5 @@ Json file example
 
 ## Expose application over the web
 I recommend using ngrok to expose this api for demo purpose  
-Ngrok: [https://ngrok.com](https://ngrok.com)
+ngrok: [https://ngrok.com](https://ngrok.com)
 
