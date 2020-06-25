@@ -5,6 +5,9 @@
 <p>
 <br/>
 <p align="center">
+    <a href="https://github.com/voidful/nlp2go/releases/">
+        <img alt="Release" src="https://img.shields.io/github/v/release/voidful/nlp2go">
+    </a>
     <a href="https://pypi.org/project/nlp2go/">
         <img alt="PyPI" src="https://img.shields.io/pypi/v/nlp2go">
     </a>
@@ -12,7 +15,10 @@
         <img alt="Download" src="https://img.shields.io/pypi/dm/nlp2go">
     </a>
     <a href="https://github.com/voidful/nlp2go">
-        <img alt="Size" src="https://img.shields.io/github/repo-size/voidful/nlp2go">
+        <img alt="Build" src="https://img.shields.io/github/workflow/status/voidful/nlp2go/Python package">
+    </a>
+    <a href="https://github.com/voidful/nlp2go">
+        <img alt="Last Commit" src="https://img.shields.io/github/last-commit/voidful/nlp2go">
     </a>
 </p>
 <br/>
