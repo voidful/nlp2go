@@ -1,6 +1,6 @@
 <p  align="center">
     <br>
-    <img src="https://raw.githubusercontent.com/voidful/nlp2go/master/doc/img/nlp2go.png" width="400"/>
+    <img src="https://raw.githubusercontent.com/voidful/nlp2go/master/docs/img/nlp2go.png" width="400"/>
     <br>
 </p>
 <br/>
