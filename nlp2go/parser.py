@@ -1,0 +1,106 @@
+from collections import OrderedDict
+import nlp2
+
+
+class Parser:
+    def __init__(self, model_type):
+        self.input_parser = self.INPUT_PARSER_MAPPING[model_type]
+        self.output_parser = self.OUTPUT_PARSER_MAPPING[model_type]
+
+    def inputParser(self, argument={}, enable_arg_panel=False):
+        argument = nlp2.function_argument_panel(self.input_parser, inputted_arg=argument,
+                                                disable_input_panel=(not enable_arg_panel))
+        # error input check
+        wrong = nlp2.function_check_wrong_arg(self.input_parser, list(argument.keys()))
+        if len(wrong) > 0:
+            return {"wrong": wrong, "all": nlp2.function_get_all_arg(self.input_parser)}
+        else:
+            return self.input_parser(self, **argument)
+
+    def outputParser(self, *outputs):
+        return self.output_parser(self, outputs)
+
+    # Specific Model Input Parser
+    def inputTfkitGeneralParser(self, input=""):
+        # sep = tfkit.utility.tok_sep(self.model.tokenizer)
+        # sep = sep.replace('[', '\[').replace(']', '\]').replace('<', '\<').replace('>', '\>')
+        # regex = r"\[Question\]|[0-9]+|[a-zA-Z]+\'*[a-z]*|[\w\W]" + "|" + sep
+        # input = " ".join(re.findall(regex, input, re.UNICODE))
+        return {'input': input}
+
+    def inputHFGeneralParser(self, input=""):
+        return input
+
+    def inputTfkitQAParser(self, passage="", question=""):
+        return {'input': passage + "[SEP]" + question}
+
+    def inputHFQAParser(self, context="", question=""):
+        return {'context': context, 'question': question}
+
+    # Specific Model Output Parser
+    def outputHFGeneralParser(self, result_list):
+        answer_list = []
+        for r in result_list:
+            answer_list.append(r)
+        return {'result': answer_list}
+
+    def outputTfkitGeneralParser(self, output):
+        (result_list, result_dict) = output[0]
+        return {
+            'result': result_list,
+            'result_info': result_dict
+        }
+
+    def outputHFQAParser(self, result_list):
+        answer_list = []
+        for r in result_list:
+            answer_list.append(r['answer'])
+        return {'result': answer_list, 'result_info': result_list}
+
+    OUTPUT_PARSER_MAPPING = OrderedDict(
+        [
+            # Huggingface's model
+            ("feature-extraction", outputHFGeneralParser,),
+            ("sentiment-analysis", outputHFGeneralParser,),
+            ("ner", outputHFGeneralParser,),
+            ("question-answering", outputHFQAParser,),
+            ("fill-mask", outputHFGeneralParser,),
+            ("summarization", outputHFGeneralParser,),
+            ("translation_en_to_fr", outputHFGeneralParser,),
+            ("translation_en_to_de", outputHFGeneralParser,),
+            ("translation_en_to_ro", outputHFGeneralParser,),
+            ("text-generation", outputHFGeneralParser,),
+            # TFKIT model
+            ("Tagger", outputTfkitGeneralParser,),
+            ("QA", outputTfkitGeneralParser,),
+            ("Twice", outputTfkitGeneralParser,),
+            ("OneByOne", outputTfkitGeneralParser,),
+            ("Once", outputTfkitGeneralParser,),
+            ("BiDiOneByOne", outputTfkitGeneralParser,),
+            ("MtClassifier", outputTfkitGeneralParser,),
+        ]
+    )
+
+    INPUT_PARSER_MAPPING = OrderedDict(
+        [
+            # Huggingface's model
+            ("feature-extraction", inputHFGeneralParser,),
+            ("sentiment-analysis", inputHFGeneralParser,),
+            ("ner", inputHFGeneralParser,),
+            ("question-answering", inputHFQAParser,),
+            ("fill-mask", inputHFGeneralParser,),
+            ("summarization", inputHFGeneralParser,),
+            ("translation_en_to_fr", inputHFGeneralParser,),
+            ("translation_en_to_de", inputHFGeneralParser,),
+            ("translation_en_to_ro", inputHFGeneralParser,),
+            ("text-generation", inputHFGeneralParser,),
+            # TFKIT model
+            ("Tagger", inputTfkitGeneralParser,),
+            ("QA", inputTfkitQAParser,),
+            ("Twice", inputTfkitGeneralParser,),
+            ("OneByOne", inputTfkitGeneralParser,),
+            ("Once", inputTfkitGeneralParser,),
+            ("BiDiOneByOne", inputTfkitGeneralParser,),
+            ("MtClassifier", inputTfkitGeneralParser,),
+        ]
+    )

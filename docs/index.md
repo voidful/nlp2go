@@ -1,6 +1,6 @@
 <p  align="center">
     <br>
-    <img src="https://raw.githubusercontent.com/voidful/nlp2go/master/doc/img/nlp2go.png" width="400"/>
+    <img src="https://raw.githubusercontent.com/voidful/nlp2go/master/doc/img/nlp2go.png" width="300"/>
     <br>
 </p>
 <br/>
@@ -18,53 +18,35 @@
         <img alt="Last Commit" src="https://img.shields.io/github/last-commit/voidful/nlp2go">
     </a>
 </p>
-<br/>
-## nlp2go
-**Hosting nlp models in one line**  
 
-### Introduction
+## Introduction
 Once the model is trained, we want to verify our model as quickly as possible.
 nlp2go provides a CLI interface and  Restful api that allows you to quickly deploy model to everyone.
 
-### Feature
-There are many additional features :
-- Support loading multiple models at a time.
-- Provide input format checking.
-- You can also load models in python code.
-- Flexible handling of parameters so that parameter can be changed in each prediction.
-- Support huggingface transformers’s model
-- There are models in the Model Hub for you to try  
+## Feature  
+There are many additional features :  
+- Support loading multiple models at a time.  
+- Provide input format checking.  
+- You can also load models in python code.  
+- Flexible handling of parameters so that parameter can be changed in each prediction.  
+- Support huggingface transformers’s model.  
+- There are models in the Model Hub for you to try.
 
-# Documentation
-Learn more from the [docs]().  
 
 ## Quick Start
-
 ### Installing via pip
 ```bash
 pip install nlp2go
 ```
+### Load model into a CLI interface
+```
+nlp2go --model model_path --cli
+```
+### Load model into a Restful API
+```
+nlp2go --model model_path --api_path model_task_name --api_port 3000
+```
 
-### hosting single model
-```
-nlp2go --model model_path 
-```
-### hosting multiple models
-1. create a json file as below:
-```json
-{
-    "API1_PATH": {
-      "model": "model1_path"
-    },
-    "API2_PATH": {
-      "model": "model2_path"
-    }
-}
-```
-2. run
-```
-nlp2go --json json_file_path  
-```
 **You can also try nlp2go in Google Colab: [![Google Colab](https://colab.research.google.com/assets/colab-badge.svg "nlp2go")](https://colab.research.google.com/drive/1tR_AcBLnzZCGG_dB9_TX-AulhnMu0Eb5?usp=sharing)**
 
 

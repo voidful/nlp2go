@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='nlp2go',
-    version='0.0.18',
+    version='0.1.0',
     description='hosting nlp models for demo purpose',
     url='https://github.com/voidful/nlp2go',
     author='Voidful',
@@ -15,10 +15,11 @@ setup(
         "tfkit>=0.3.10",
         "flask",
         "flask-cors",
-        "gevent"
+        "gevent",
+        "nlp2>=1.6.5"
     ],
     entry_points={
-        'console_scripts': ['nlp2go=nlp2go.server:main', 'nlp2go-preload=nlp2go.prep:main']
+        'console_scripts': ['nlp2go=nlp2go.main:main', 'nlp2go-preload=nlp2go.preload:main']
     },
     zip_safe=False,
 )

@@ -1,96 +1,59 @@
-import re
 import tfkit
-import torch
-from transformers import BertTokenizer, AutoTokenizer, AutoModel
+from transformers import pipeline, pipelines, BertTokenizer
+import inquirer
+from .parser import *
 
 
 class Model:
-    def __init__(self):
+
+    def __init__(self, model_path, model_task=None, enable_arg_panel=False):
         self.model = None
-        self.maxlen = 512
+        if nlp2.is_file_exist(model_path) or "tfkit_" in model_path:  # tfkit models
+            self.lib = 'tfkit'
+            self.model, self.predict_parameter, self.model_task = self.load_tfkit_model(model_path, model_task,
+                                                                                        enable_arg_panel)
+        else:  # huggingface's transfromers model - local model saved in dir, online model name without tfkit tag
+            self.lib = 'hf'
+            self.model, self.predict_parameter, self.model_task = self.load_huggingface_model(model_path, model_task,
+                                                                                              enable_arg_panel)
 
-    def load_model(self, model_path, model_type=None):
-        device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        package = torch.load(model_path, map_location=device)
+    def load_huggingface_model(self, model_path, model_task=None, enable_arg_panel=False):
+        supported_type = list(pipelines.SUPPORTED_TASKS.keys())
+        if model_task is None or model_task not in supported_type:
+            inquirer_res = inquirer.prompt(
+                [inquirer.List('model_task', message="Select model task", choices=supported_type)])
+            model_task = inquirer_res['model_task']
 
-        maxlen = package['maxlen']
-        config = package['model_config'] if 'model_config' in package else package['bert']
-        model_types = [package['type']] if not isinstance(package['type'], list) else package['type']
-        models_state = package['models'] if 'models' in package else [package['model_state_dict']]
+        tok_conf = BertTokenizer.from_pretrained(model_path) if 'voidful/albert_chinese' in model_path else model_path
+        nlp = pipeline(model_task, model=model_path,
+                       tokenizer=tok_conf)
+        predict_parameter = {}
+        return nlp, predict_parameter, model_task
 
-        print("===model info===")
-        print("maxlen", maxlen)
-        print("type", model_types)
-        print("config", config)
-        print('==========')
+    def load_tfkit_model(self, model_path, model_task=None, enable_arg_panel=False):
+        model = tfkit.load_model(model_path, model_task)
+        predict_parameter = tfkit.load_predict_parameter(model, enable_arg_panel=enable_arg_panel)
+        model_task = model.__class__.__name__
+        return model, predict_parameter, model_task
 
-        # load pre-train model
-        if 'albert_chinese' in config:
-            tokenizer = BertTokenizer.from_pretrained(config)
+    def predict(self, argument={}, enable_input_panel=False):
+        parser = Parser(self.model_task)
+        input_argument = parser.inputParser(argument, enable_input_panel)
+
+        if "wrong" in input_argument:
+            return {
+                'result': 'incorrect input:' + str(input_argument['wrong']) +
+                          ', Should be:' + str(input_argument["all"]),
+                'result_info': input_argument
+            }
         else:
-            tokenizer = AutoTokenizer.from_pretrained(config)
-        pretrained = AutoModel.from_pretrained(config)
+            if self.lib == 'hf':
+                predict_func = self.model
+            else:
+                predict_func = self.model.predict
 
-        type = model_types[0] if model_type is None else model_type
-
-        if "once" in type:
-            model = tfkit.gen_once.Once(tokenizer, pretrained, maxlen=maxlen)
-        elif "twice" in type:
-            model = tfkit.gen_twice.Twice(tokenizer, pretrained, maxlen=maxlen)
-        elif "onebyone" in type:
-            model = tfkit.gen_onebyone.OneByOne(tokenizer, pretrained, maxlen=maxlen)
-        elif 'classify' in type:
-            model = tfkit.classifier.MtClassifier(package['task'], tokenizer, pretrained)
-        elif 'tag' in type:
-            model = tfkit.tag.Tagger(package['label'], tokenizer, pretrained, maxlen=maxlen)
-        elif 'qa' in type:
-            model = tfkit.qa.QA(tokenizer, pretrained, maxlen=maxlen)
-
-        model = model.to(device)
-        model.load_state_dict(models_state[model_types.index(type)], strict=False)
-
-        self.model = model
-        self.maxlen = maxlen
-        self.type = type
-
-    def predict(self, input, param_dict):
-        beamsearch = param_dict.get('beamsearch', False)
-        beamsize = param_dict.get('beamsize', 3)
-        filtersim = param_dict.get('filtersim', True)
-        topP = param_dict.get('topP', 1)
-        topK = param_dict.get('topK', 0.7)
-        task = param_dict.get('task', None)
-
-        if 'classify' in self.type:
-            if task is None:
-                print(list(self.model.tasks_detail))
-                task = list(self.model.tasks_detail)[0]
-        else:
-            task = 'default'
-
-        predict_param = {'input': '', 'task': task}
-        if beamsearch and 'onebyone' in self.type:
-            predict_param['beamsearch'] = beamsearch
-            predict_param['beamsize'] = beamsize
-            predict_param['filtersim'] = filtersim
-        elif 'onebyone' in self.type:
-            predict_param['topP'] = topP
-            predict_param['topK'] = topK
-
-        predict_func = self.model.predict
-        sep = tfkit.utility.tok_sep(self.model.tokenizer)
-        sep = sep.replace('[', '\[').replace(']', '\]').replace('<', '\<').replace('>', '\>')
-        regex = r"\[Question\]|[0-9]+|[a-zA-Z]+\'*[a-z]*|[\w\W]" + "|" + sep
-        input = " ".join(re.findall(regex, input, re.UNICODE))
-        predict_param['input'] = input
-        predict_param['task'] = task
-        result_list, results_dict = predict_func(**predict_param)
-        result_dict = self.convert2json(result_list, results_dict)
-        return result_dict
-
-    def convert2json(self, result, map):
-        result_dict = {
-            'result': result,
-            'result_info': map
-        }
-        return result_dict
+            if isinstance(input_argument, str):
+                return parser.outputParser(predict_func(input_argument))
+            else:
+                self.predict_parameter.update(input_argument)
+                return parser.outputParser(predict_func(**self.predict_parameter))

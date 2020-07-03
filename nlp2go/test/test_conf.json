@@ -1,0 +1,6 @@
+{
+    "albert_mask": {
+      "model": "voidful/albert_chinese_tiny",
+      "task": "fill-mask"
+    }
+}

@@ -3,3 +3,4 @@ tfkit>=0.3.10
 flask
 flask-cors
 gevent
+inquirer

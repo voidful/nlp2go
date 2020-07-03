@@ -35,3 +35,4 @@ jobs:
     - name: Build
       run: |
         python setup.py install
+        nlp2go -h

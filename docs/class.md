@@ -1,0 +1,11 @@
+# Class
+## Main
+::: nlp2go.main
+## Model
+::: nlp2go.model.Model
+## Parser
+::: nlp2go.parser
+## CLI
+::: nlp2go.cli
+## Server
+::: nlp2go.server
