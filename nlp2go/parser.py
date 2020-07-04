@@ -1,9 +1,12 @@
+import re
 from collections import OrderedDict
 import nlp2
+import tfkit
 
 
 class Parser:
-    def __init__(self, model_type):
+    def __init__(self, model_type, model):
+        self.model = model
         self.input_parser = self.INPUT_PARSER_MAPPING[model_type]
         self.output_parser = self.OUTPUT_PARSER_MAPPING[model_type]
 
@@ -22,17 +25,18 @@ class Parser:
 
     # Specific Model Input Parser
     def inputTfkitGeneralParser(self, input=""):
-        # sep = tfkit.utility.tok_sep(self.model.tokenizer)
-        # sep = sep.replace('[', '\[').replace(']', '\]').replace('<', '\<').replace('>', '\>')
-        # regex = r"\[Question\]|[0-9]+|[a-zA-Z]+\'*[a-z]*|[\w\W]" + "|" + sep
-        # input = " ".join(re.findall(regex, input, re.UNICODE))
+        sep = tfkit.utility.tok_sep(self.model.tokenizer)
+        sep = sep.replace('[', '\[').replace(']', '\]').replace('<', '\<').replace('>', '\>')
+        regex = r"[0-9]+|[a-zA-Z]+\'*[a-z]*|[\w\W]" + "|" + sep
+        input = " ".join(re.findall(regex, input, re.UNICODE))
         return {'input': input}
 
     def inputHFGeneralParser(self, input=""):
         return input
 
     def inputTfkitQAParser(self, passage="", question=""):
-        return {'input': passage + "[SEP]" + question}
+        sep = tfkit.utility.tok_sep(self.model.tokenizer)
+        return {'input': passage + sep + question}
 
     def inputHFQAParser(self, context="", question=""):
         return {'context': context, 'question': question}

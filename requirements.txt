@@ -1,4 +1,4 @@
-nlp2
+nlp2>=1.6.7
 tfkit>=0.3.10
 flask
 flask-cors

@@ -37,7 +37,7 @@ class Model:
         return model, predict_parameter, model_task
 
     def predict(self, argument={}, enable_input_panel=False):
-        parser = Parser(self.model_task)
+        parser = Parser(self.model_task, self.model)
         input_argument = parser.inputParser(argument, enable_input_panel)
 
         if "wrong" in input_argument:

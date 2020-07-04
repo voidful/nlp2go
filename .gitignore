@@ -247,3 +247,7 @@ how2
 ./nlp2go/test/cache
 /nlp2go/test/cache
 nlp2go/test/cache
+
+/test
+./test
+test
