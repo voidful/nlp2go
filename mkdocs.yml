@@ -48,13 +48,10 @@ extra:
     - icon: fontawesome/brands/linkedin
       link: https://www.linkedin.com/in/voidful/
 
-extra_css:
-  - css/mkdocstrings.css
-
-## Google Analytics
-#google_analytics:
-#  - UA-XXXXXXXX-X
-#  - auto
+# Google Analytics
+google_analytics:
+  - UA-127062540-3
+  - auto
 
 # Extensions
 markdown_extensions:

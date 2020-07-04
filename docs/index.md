@@ -32,7 +32,6 @@ There are many additional features :
 - Support huggingface transformers’s model.  
 - There are models in the Model Hub for you to try.
 
-
 ## Quick Start
 ### Installing via pip
 ```bash
@@ -56,3 +55,7 @@ Thanks for your interest.There are many ways to contribute to this project. Get 
 ## License ![PyPI - License](https://img.shields.io/github/license/voidful/nlp2go)
 
 * [License](https://github.com/voidful/nlp2go/blob/master/LICENSE)
+
+## Icons reference
+Icons modify from <a href="https://www.flaticon.com/free-icon/running_2151630" title="Good Ware">Good Ware</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>     
+Icons modify from <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>    

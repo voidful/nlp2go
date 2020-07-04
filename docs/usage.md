@@ -132,6 +132,25 @@ argument:
 `--api_path path` set API path after 'host/API/'   
 `--api_port` set hosting port   
 
+####api detail:  
+#####url  
+    `host/API/path`  
+#####method  
+    `GET` | `POST`  
+#####url Params 
+
+by default   
+```
+input=[string] 
+``` 
+
+task specific eg: QA   
+```
+context[string]  
+question=[string]
+```
+     
+
 ### Python code
 ```python
 import nlp2go
