@@ -6,6 +6,10 @@ from .cli import Cli
 from .model import Model
 from .server import Server
 
+import os
+
+os.environ["PYTHONIOENCODING"] = "utf-8"
+
 
 def main():
     """
