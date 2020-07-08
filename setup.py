@@ -16,7 +16,7 @@ setup(
         "flask",
         "flask-cors",
         "gevent",
-        "nlp2>=1.8.2"
+        "nlp2>=1.8.4"
     ],
     entry_points={
         'console_scripts': ['nlp2go=nlp2go.main:main', 'nlp2go-preload=nlp2go.preload:main']

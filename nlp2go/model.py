@@ -20,9 +20,9 @@ class Model:
     def load_huggingface_model(self, model_path, model_task=None, enable_arg_panel=False):
         supported_type = list(pipelines.SUPPORTED_TASKS.keys())
         if model_task is None or model_task not in supported_type:
-            inquirer_res = inquirer.prompt(
-                [inquirer.List('model_task', message="Select model task", choices=supported_type)])
-            model_task = inquirer_res['model_task']
+            panel = nlp2.Panel()
+            panel.add_element('model_task', supported_type, "Select model task: ")
+            model_task = panel.get_result_dict()['model_task']
 
         tok_conf = BertTokenizer.from_pretrained(model_path) if 'voidful/albert_chinese' in model_path else model_path
         nlp = pipeline(model_task, model=model_path,
