@@ -21,6 +21,7 @@ def main():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--json', type=str)
     group.add_argument('--model', type=str)
+    parser.add_argument("--config", type=str, help='pretrained model path after add token')
     parser.add_argument('--enable_arg_panel', action='store_true', help='enable panel to input argument')
     parser.add_argument('--task', type=str)
     # interface
@@ -31,7 +32,7 @@ def main():
     args = parser.parse_args()
 
     if args.model:
-        model_dict[args.api_path] = Model(args.model, args.task, args.enable_arg_panel)
+        model_dict[args.api_path] = Model(args.model, args.config, args.task, args.enable_arg_panel)
     else:
         with open(args.json, 'r', encoding='utf8') as reader:
             model_dict = json.loads(reader.read())
