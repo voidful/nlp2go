@@ -66,7 +66,7 @@ nlp2go --model model_path
 ```
 nlp2go --json json_file_path  
 ```
-**You can also try nlp2go in Google Colab: [![Google Colab](https://colab.research.google.com/assets/colab-badge.svg "nlp2go")](https://colab.research.google.com/drive/1tR_AcBLnzZCGG_dB9_TX-AulhnMu0Eb5?usp=sharing)**
+**You can also try nlp2go in Google Colab: [![Google Colab](https://colab.research.google.com/drive/15aYFPsa88A20g5R2QS3kyVrjGlccr0Qd?usp=sharing)**
 
 
 ## Contributing

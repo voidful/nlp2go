@@ -46,7 +46,7 @@ nlp2go --model model_path --cli
 nlp2go --model model_path --api_path model_task_name --api_port 3000
 ```
 
-**You can also try nlp2go in Google Colab: [![Google Colab](https://colab.research.google.com/assets/colab-badge.svg "nlp2go")](https://colab.research.google.com/drive/1tR_AcBLnzZCGG_dB9_TX-AulhnMu0Eb5?usp=sharing)**
+**You can also try nlp2go in Google Colab: [![Google Colab](https://colab.research.google.com/drive/15aYFPsa88A20g5R2QS3kyVrjGlccr0Qd?usp=sharing)**
 
 
 ## Contributing

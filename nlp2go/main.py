@@ -21,7 +21,7 @@ def main():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--json', type=str)
     group.add_argument('--model', type=str)
-    parser.add_argument("--config", type=str, help='pretrained model path after add token')
+    parser.add_argument("--config", type=str, help='pre-trained model path after add token')
     parser.add_argument('--enable_arg_panel', action='store_true', help='enable panel to input argument')
     parser.add_argument('--task', type=str)
     # interface
@@ -29,7 +29,7 @@ def main():
     parser.add_argument('--api_port', type=int, default=3000, help='port to serve the demo on')
     parser.add_argument('--cli', action='store_true', help='commandline mode')
 
-    args = parser.parse_args()
+    args, unknown = parser.parse_known_args()
 
     if args.model:
         model_dict[args.api_path] = Model(args.model, args.config, args.task, args.enable_arg_panel)
