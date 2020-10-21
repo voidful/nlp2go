@@ -25,10 +25,6 @@ class Parser:
 
     # Specific Model Input Parser
     def inputTfkitGeneralParser(self, input=""):
-        sep = tfkit.utility.tok_sep(self.model.tokenizer)
-        sep = sep.replace('[', '\[').replace(']', '\]').replace('<', '\<').replace('>', '\>')
-        regex = r"[0-9]+|[a-zA-Z]+\'*[a-z]*|[\w\W]" + "|" + sep
-        input = " ".join(re.findall(regex, input, re.UNICODE))
         return {'input': input}
 
     def inputHFGeneralParser(self, input=""):

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='nlp2go',
-    version='0.2.0',
+    version='0.2.1',
     description='hosting nlp models for demo purpose',
     url='https://github.com/voidful/nlp2go',
     author='Voidful',
