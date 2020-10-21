@@ -14,9 +14,9 @@ class Parser:
         argument = nlp2.function_argument_panel(self.input_parser, inputted_arg=argument,
                                                 disable_input_panel=(not enable_arg_panel))
         # error input check
-        wrong = nlp2.function_check_wrong_arg(self.input_parser, list(argument.keys()))
-        if len(wrong) > 0:
-            return {"wrong": wrong, "all": nlp2.function_get_all_arg(self.input_parser)}
+        miss = nlp2.function_check_missing_arg(self.input_parser, list(argument.keys()))
+        if len(miss) > 0:
+            return {"wrong": miss, "all": nlp2.function_get_all_arg(self.input_parser)}
         else:
             return self.input_parser(self, **argument)
 

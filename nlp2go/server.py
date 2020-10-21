@@ -32,17 +32,17 @@ class Server:
     def make_app(self, models, model_detail) -> Flask:
         app = Flask(__name__)  # pylint: disable=invalid-name
 
-        @app.route('/api/<path>', methods=['GET', 'POST'])
+        @app.route('/api/<path>', methods=['POST'])
         def predict(path) -> Response:
             if path in models:
-                result_dict = models[path].predict(dict(request.values), enable_input_panel=False)
+                result_dict = models[path].predict(request.json, enable_input_panel=False)
                 return Response(json.dumps({'result': result_dict['result']}, ensure_ascii=False, cls=NumpyEncoder,
                                            indent=4,
                                            sort_keys=True))
             else:
                 raise self.ServerError("parameter not found", 404)
 
-        @app.route('/api/config', methods=['GET', 'POST'])
+        @app.route('/api/config', methods=['GET'])
         def config() -> Response:
             try:
                 return Response(json.dumps(model_detail, ensure_ascii=False, cls=NumpyEncoder,
@@ -56,7 +56,8 @@ class Server:
             timestamp = strftime('[%Y-%b-%d %H:%M]')
             response_json = json.loads(response.get_data())
             if response_json is not None and 'result' in response_json:
-                logger.error('%s %s %s %s', timestamp, request.access_route[-1], dict(request.args), response_json['result'])
+                logger.error('%s %s %s %s', timestamp, request.access_route, request.json,
+                             response_json['result'])
             return response
 
         return app

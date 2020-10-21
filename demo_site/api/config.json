@@ -1,0 +1,124 @@
+{
+  "zhner": {
+    "model": "tfkit_zh_ner_small",
+    "description": "輸入短文，命名實體識別可以從中找尋地點，物件，人物等...",
+    "name": "中文NER",
+    "component": [
+      {
+        "name": "input",
+        "type": "textarea",
+        "placeholder": "輸入一篇短文"
+      }
+    ],
+    "example": [
+      {
+        "input": "PyTorch是一個開源的Python機器學習庫，基於Torch，底層由C++實現，應用於人工智慧領域，如自然語言處理。 它最初由Facebook的人工智慧研究團隊開發，並且被用於Uber的概率編程軟體Pyro。 PyTorch主要有兩大特徵： 類似於NumPy的張量計算，可使用GPU加速；",
+        "name": "Pytorch"
+      },
+      {
+        "input": "動物有幾種將其與其他生物相區隔的特徵。動物均屬真核生物，且通常是多細胞的（例外請見黏體動物），這將其與細菌和大多數的原生生物相區隔。動物是消費者，通常在一個內腔中消化食物，這將其與植物和藻類相區隔。動物也因缺乏細胞壁而和植物、藻類和真菌不同。所有的動物都是能動的，若只算一部份的生長期間。胚胎會有形成囊胚的時期，這是只有動物才有的特徵。",
+        "name": "Animal"
+      }
+    ]
+  },
+  "zhstm": {
+    "model": "tfkit_zh_stm_small",
+    "description": "輸入一段文本，分析其中情緒",
+    "name": "中文正負面情緒分析",
+    "component": [
+      {
+        "name": "input",
+        "type": "textarea",
+        "placeholder": "輸入文本"
+      }
+    ],
+    "example": [
+      {
+        "input": "噓最後一行，想騙？",
+        "name": "負面"
+      },
+      {
+        "input": "感謝分享 ",
+        "name": "正面"
+      }
+    ]
+  },
+  "zhdream": {
+    "model": "tfkit_zh_dream_small",
+    "description": "Albert 模型為你測夢，輸入你所夢到的，它會告訴你其中的預兆",
+    "name": "艾伯特測夢",
+    "component": [
+      {
+        "name": "input",
+        "type": "textarea",
+        "placeholder": "輸入文本"
+      }
+    ],
+    "example": [
+      {
+        "input": "要發大財啦",
+        "name": "發大財"
+      },
+      {
+        "input": "電腦大爆炸",
+        "name": "電腦大爆炸"
+      }
+    ]
+  },
+  "zhmrc": {
+    "model": "tfkit_zh_mrc_small",
+    "description": "輸入短文和相關問題，閱讀理解模型可以從短文中找出答案",
+    "name": "中文閱讀理解",
+    "component": [
+      {
+        "name": "passage",
+        "type": "textarea",
+        "placeholder": "Passage"
+      },{
+        "name": "question",
+        "type": "input",
+        "placeholder": "Question"
+      }
+    ],
+    "example": [
+      {
+        "passage": "PyTorch是一個開源的Python機器學習庫，基於Torch，底層由C++實現，應用於人工智慧領域，如自然語言處理。 它最初由Facebook的人工智慧研究團隊開發，並且被用於Uber的概率編程軟體Pyro。 PyTorch主要有兩大特徵： 類似於NumPy的張量計算，可使用GPU加速；",
+        "question": "Pytorch是哪一個團隊做的？",
+        "name": "Pytorch"
+      },
+      {
+        "passage": "動物有幾種將其與其他生物相區隔的特徵。動物均屬真核生物，且通常是多細胞的（例外請見黏體動物），這將其與細菌和大多數的原生生物相區隔。動物是消費者，通常在一個內腔中消化食物，這將其與植物和藻類相區隔。動物也因缺乏細胞壁而和植物、藻類和真菌不同。所有的動物都是能動的，若只算一部份的生長期間。胚胎會有形成囊胚的時期，這是只有動物才有的特徵。",
+        "question": "動物是？",
+        "name": "Animal"
+      }
+    ]
+  },
+  "enmrc": {
+    "model": "tfkit_en_mrc_small",
+    "description": "Predict the answer segment, or span, from the corresponding reading passage",
+    "name": "English Reading Comprehension",
+    "component": [
+      {
+        "name": "passage",
+        "type": "textarea",
+        "placeholder": "Passage"
+      },{
+        "name": "question",
+        "type": "input",
+        "placeholder": "Question"
+      }
+    ],
+    "example": [
+      {
+        "passage": "The Matrix is a 1999 science fiction action film written and directed by The Wachowskis, starring Keanu Reeves, Laurence Fishburne, Carrie-Anne Moss, Hugo Weaving, and Joe Pantoliano. It depicts a dystopian future in which reality as perceived by most humans is actually a simulated reality called \"the Matrix\", created by sentient machines to subdue the human population, while their bodies' heat and electrical activity are used as an energy source. Computer programmer \"Neo\" learns this truth and is drawn into a rebellion against the machines, which involves other people who have been freed from the \"dream world.\"",
+        "question": "The Matrix created by ?",
+        "name": "The Matrix"
+      },
+      {
+        "passage": "Kerbal Space Program (KSP) is a space flight simulation video game developed and published by Squad for Microsoft Windows, OS X, Linux, PlayStation 4, Xbox One, with a Wii U version that was supposed to be released at a later date. The developers have stated that the gaming landscape has changed since that announcement and more details will be released soon. In the game, players direct a nascent space program, staffed and crewed by humanoid aliens known as \"Kerbals\". The game features a realistic orbital physics engine, allowing for various real-life orbital maneuvers such as Hohmann transfer orbits and bi-elliptic transfer orbits.",
+        "question": "What does the physics engine allow for？",
+        "name": "Kerbal Space Program"
+      }
+    ]
+  }
+}

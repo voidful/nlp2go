@@ -1,0 +1,32 @@
+version: '2'
+services:
+  nlp2go-web-server:
+    build:
+      context: './site'
+    restart: always
+    container_name: nlp2go-web-server
+    environment:
+      REACT_APP_API_URL: http://nlp2go-api:8021/api/
+    ports:
+      - "80:80"
+    networks:
+      - apiproxy
+
+  nlp2go-api:
+    build: './api'
+    restart: always
+    environment:
+      - PORT=8021
+    container_name: nlp2go-api
+    volumes:
+      - ./log/:/usr/src/app/log/
+    expose:
+      - 8021
+    networks:
+      - apiproxy
+
+
+networks:
+  apiproxy:
+    driver: bridge
+
