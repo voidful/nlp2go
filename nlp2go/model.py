@@ -1,6 +1,6 @@
-import tfkit
-from transformers import pipeline, pipelines, BertTokenizer
-import inquirer
+from transformers import pipeline, pipelines, BertTokenizer, cached_path
+
+from .modelhub import MODELMAP
 from .parser import *
 
 
@@ -24,7 +24,7 @@ class Model:
         supported_type = list(pipelines.SUPPORTED_TASKS.keys())
         if model_task is None or model_task not in supported_type:
             panel = nlp2.Panel()
-            panel.add_element('model_task', supported_type, "Select model task: ")
+            panel.add_element('model_task', supported_type, "Select model task: ", default={})
             model_task = panel.get_result_dict()['model_task']
 
         tok_conf = BertTokenizer.from_pretrained(model_path) if 'voidful/albert_chinese' in model_path else model_path
@@ -34,7 +34,8 @@ class Model:
         return nlp, predict_parameter, model_task
 
     def load_tfkit_model(self, model_path, model_pretrained=None, model_task=None, enable_arg_panel=False):
-        model = tfkit.load_model(model_path, model_pretrained, model_task)
+        model_path = MODELMAP[model_path] if model_path in MODELMAP else model_path
+        model = tfkit.load_model(cached_path(model_path), model_pretrained, model_task)
         predict_parameter = tfkit.load_predict_parameter(model, enable_arg_panel=enable_arg_panel)
         model_task = model.__class__.__name__
         return model, predict_parameter, model_task

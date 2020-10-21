@@ -30,9 +30,9 @@ def main():
     parser.add_argument('--cli', action='store_true', help='commandline mode')
 
     args, unknown = parser.parse_known_args()
-
+    loaded_model = {}
     if args.model:
-        model_dict[args.api_path] = Model(args.model, args.config, args.task, args.enable_arg_panel)
+        loaded_model[args.api_path] = Model(args.model, args.config, args.task, args.enable_arg_panel)
     else:
         with open(args.json, 'r', encoding='utf8') as reader:
             model_dict = json.loads(reader.read())
@@ -40,14 +40,15 @@ def main():
         for path, d in model_dict.items():
             task = model_dict[path]['task'] if 'task' in model_dict[path] else None
             model = Model(model_dict[path]['model'], task, args.enable_arg_panel)
-            model_dict[path] = model
+            loaded_model[path] = model
+            model_dict[path].pop('model')
 
     if args.cli:
         cli = Cli()
-        cli.start(model_dict)
+        cli.start(loaded_model)
     else:
         server = Server()
-        server.start(model_dict, args.api_port)
+        server.start(loaded_model, args.api_port, model_dict)
 
 
 if __name__ == "__main__":

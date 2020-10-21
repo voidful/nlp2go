@@ -1,4 +1,9 @@
 import logging
+import os
+from logging.handlers import TimedRotatingFileHandler
+from time import strftime
+
+import nlp2
 from flask import Flask, request, Response
 from flask_cors import CORS
 from gevent.pywsgi import WSGIServer
@@ -24,24 +29,47 @@ class Server:
             error_dict['message'] = self.message
             return error_dict
 
-    def make_app(self, models) -> Flask:
+    def make_app(self, models, model_detail) -> Flask:
         app = Flask(__name__)  # pylint: disable=invalid-name
 
         @app.route('/api/<path>', methods=['GET', 'POST'])
         def predict(path) -> Response:
             if path in models:
                 result_dict = models[path].predict(dict(request.values), enable_input_panel=False)
-                return json.dumps({'result': result_dict['result']}, ensure_ascii=False, cls=NumpyEncoder,
-                                  indent=4,
-                                  sort_keys=True)
+                return Response(json.dumps({'result': result_dict['result']}, ensure_ascii=False, cls=NumpyEncoder,
+                                           indent=4,
+                                           sort_keys=True))
             else:
                 raise self.ServerError("parameter not found", 404)
 
+        @app.route('/api/config', methods=['GET', 'POST'])
+        def config() -> Response:
+            try:
+                return Response(json.dumps(model_detail, ensure_ascii=False, cls=NumpyEncoder,
+                                           indent=4,
+                                           sort_keys=True))
+            except:
+                raise self.ServerError("parameter not found", 404)
+
+        @app.after_request
+        def after_request(response):
+            timestamp = strftime('[%Y-%b-%d %H:%M]')
+            response_json = json.loads(response.get_data())
+            if response_json is not None and 'result' in response_json:
+                logger.error('%s %s %s %s', timestamp, request.access_route[0], dict(request.args), response_json['result'])
+            return response
+
         return app
 
-    def start(self, models, port):
+    def start(self, models, port, model_detail_dict):
+        log_dir = nlp2.get_dir_with_notexist_create('./log/')
+        handler = TimedRotatingFileHandler(os.path.join(log_dir, 'api.log'), when="midnight", interval=1)
+        handler.suffix = "%Y%m%d"
+        logger.setLevel(logging.ERROR)
+        logger.addHandler(handler)
+
         print("hosting api in path: /api/+", list(models.keys()))
-        app = self.make_app(models)
+        app = self.make_app(models, model_detail_dict)
         CORS(app)
 
         http_server = WSGIServer(('0.0.0.0', port), app)
