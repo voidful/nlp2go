@@ -56,7 +56,7 @@ class Server:
             timestamp = strftime('[%Y-%b-%d %H:%M]')
             response_json = json.loads(response.get_data())
             if response_json is not None and 'result' in response_json:
-                logger.error('%s %s %s %s', timestamp, request.access_route[0], dict(request.args), response_json['result'])
+                logger.error('%s %s %s %s', timestamp, request.access_route[-1], dict(request.args), response_json['result'])
             return response
 
         return app
