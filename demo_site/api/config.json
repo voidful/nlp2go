@@ -120,5 +120,28 @@
         "name": "Kerbal Space Program"
       }
     ]
-  }
+  },
+  "zhmten": {
+      "model": "Helsinki-NLP/opus-mt-zh-en",
+      "task": "translation_en_to_fr",
+      "description": "輸入中文文本，模型會將其翻譯成英文。",
+      "name": "中文翻譯英文",
+      "component": [
+        {
+          "name": "input",
+          "type": "textarea",
+          "placeholder": "輸入一段文本"
+        }
+      ],
+      "example": [
+        {
+          "input": "早安你好，吃午餐了嗎？",
+          "name": "Greeting"
+        },
+        {
+          "input": "動物有幾種將其與其他生物相區隔的特徵。",
+          "name": "Animal"
+        }
+      ]
+    }
 }

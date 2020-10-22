@@ -20,7 +20,8 @@ def main():
         with open(args.json, 'r', encoding='utf8') as reader:
             model_dict = json.loads(reader.read())
         for k, v in model_dict.items():
-            Model(model_dict[k]['model'])
+            task = model_dict[k]['task'] if 'task' in model_dict[k] else None
+            Model(model_dict[k]['model'], model_task=task)
 
     print("==================")
     print("finish pre loading")
