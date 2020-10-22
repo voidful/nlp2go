@@ -297,3 +297,4 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+/demo_site/site/package-lock.json

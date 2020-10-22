@@ -39,7 +39,7 @@ def main():
 
         for path, d in model_dict.items():
             task = model_dict[path]['task'] if 'task' in model_dict[path] else None
-            model = Model(model_dict[path]['model'], task, args.enable_arg_panel)
+            model = Model(model_dict[path]['model'], model_task=task, enable_arg_panel=args.enable_arg_panel)
             loaded_model[path] = model
             model_dict[path].pop('model')
 
