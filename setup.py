@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='nlp2go',
-    version='0.2.5',
+    version='0.2.6',
     description='hosting nlp models for demo purpose',
     url='https://github.com/voidful/nlp2go',
     author='Voidful',
@@ -14,6 +14,7 @@ setup(
     install_requires=[
         "tfkit>=0.3.10",
         "flask",
+        "Flask-Caching",
         "flask-cors",
         "gevent",
         "nlp2>=1.8.4",

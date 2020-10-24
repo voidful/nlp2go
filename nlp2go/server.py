@@ -5,12 +5,14 @@ from time import strftime
 
 import nlp2
 from flask import Flask, request, Response
+from flask_caching import Cache
 from flask_cors import CORS
 from gevent.pywsgi import WSGIServer
 import json
 from .util import NumpyEncoder
 
 logger = logging.getLogger(__name__)
+cache = Cache(config={'CACHE_TYPE': 'simple'})
 
 
 class Server:
@@ -30,9 +32,11 @@ class Server:
             return error_dict
 
     def make_app(self, models, model_detail) -> Flask:
-        app = Flask(__name__)  # pylint: disable=invalid-name
+        app = Flask(__name__)
+        cache.init_app(app)
 
         @app.route('/api/<path>', methods=['POST'])
+        @cache.cached(timeout=50)
         def predict(path) -> Response:
             if path in models:
                 result_dict = models[path].predict(request.json, enable_input_panel=False)
