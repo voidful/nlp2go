@@ -47,6 +47,8 @@
     "model": "tfkit_zh_dream_small",
     "description": "Albert 模型為你測夢，輸入你所夢到的，它會告訴你其中的預兆",
     "name": "艾伯特測夢",
+    "topP": 10,
+    "topK": 0.6,
     "component": [
       {
         "name": "input",

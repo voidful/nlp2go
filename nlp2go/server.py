@@ -35,7 +35,11 @@ class Server:
         app = Flask(__name__)
         cache.init_app(app)
 
+        def make_cache_key(*args, **kwargs):
+            return str(request.json)
+
         @app.route('/api/<path>', methods=['POST'])
+        @cache.cached(timeout=3600, key_prefix=make_cache_key)
         def predict(path) -> Response:
             if path in models:
                 result_dict = models[path].predict(request.json, enable_input_panel=False)
