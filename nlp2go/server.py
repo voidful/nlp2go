@@ -12,7 +12,7 @@ import json
 from .util import NumpyEncoder
 
 logger = logging.getLogger(__name__)
-# cache = Cache(config={'CACHE_TYPE': 'simple'})
+cache = Cache(config={'CACHE_TYPE': 'simple'})
 
 
 class Server:
