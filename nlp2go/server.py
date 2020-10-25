@@ -12,7 +12,7 @@ import json
 from .util import NumpyEncoder
 
 logger = logging.getLogger(__name__)
-cache = Cache(config={'CACHE_TYPE': 'simple'})
+# cache = Cache(config={'CACHE_TYPE': 'simple'})
 
 
 class Server:
@@ -36,7 +36,6 @@ class Server:
         cache.init_app(app)
 
         @app.route('/api/<path>', methods=['POST'])
-        @cache.cached(timeout=50)
         def predict(path) -> Response:
             if path in models:
                 result_dict = models[path].predict(request.json, enable_input_panel=False)
