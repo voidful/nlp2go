@@ -2,7 +2,7 @@ import argparse
 from collections import defaultdict
 
 import json
-from .model import Model
+from nlp2go.model import Model
 
 
 def main():

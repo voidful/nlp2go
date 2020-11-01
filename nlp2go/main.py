@@ -2,9 +2,9 @@ import argparse
 from collections import defaultdict
 import json
 
-from .cli import Cli
-from .model import Model
-from .server import Server
+from nlp2go.cli import Cli
+from nlp2go.model import Model
+from nlp2go.server import Server
 
 import os
 

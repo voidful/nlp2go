@@ -9,7 +9,7 @@ from flask_caching import Cache
 from flask_cors import CORS
 from gevent.pywsgi import WSGIServer
 import json
-from .util import NumpyEncoder
+from nlp2go.util import NumpyEncoder
 
 logger = logging.getLogger(__name__)
 cache = Cache(config={'CACHE_TYPE': 'simple'})
@@ -35,8 +35,8 @@ class Server:
         app = Flask(__name__)
         cache.init_app(app)
 
-        def make_cache_key(*args, **kwargs):
-            return str(request.json)
+        def make_cache_key():
+            return str(request.json) + str(request.full_path)
 
         @app.route('/api/<path>', methods=['POST'])
         @cache.cached(timeout=3600, key_prefix=make_cache_key)

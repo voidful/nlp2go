@@ -1,7 +1,9 @@
+import nlp2
+import tfkit
 from transformers import pipeline, pipelines, BertTokenizer, cached_path
 
-from .modelhub import MODELMAP
-from .parser import *
+from nlp2go.modelhub import MODELMAP
+from nlp2go.parser import Parser
 
 
 class Model:
@@ -35,9 +37,8 @@ class Model:
 
     def load_tfkit_model(self, model_path, model_pretrained=None, model_task=None, enable_arg_panel=False):
         model_path = MODELMAP[model_path] if model_path in MODELMAP else model_path
-        model = tfkit.load_model(cached_path(model_path), model_pretrained, model_task)
-        predict_parameter = tfkit.load_predict_parameter(model, enable_arg_panel=enable_arg_panel)
-        model_task = model.__class__.__name__
+        model, model_task, model_class = tfkit.utility.model.load_trained_model(cached_path(model_path), model_pretrained, model_task)
+        predict_parameter = tfkit.utility.model.load_predict_parameter(model, enable_arg_panel=enable_arg_panel)
         return model, predict_parameter, model_task
 
     def predict(self, argument={}, enable_input_panel=False):

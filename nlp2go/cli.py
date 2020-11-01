@@ -1,5 +1,5 @@
 import json
-from .util import NumpyEncoder
+from nlp2go.util import NumpyEncoder
 
 
 class Cli:
