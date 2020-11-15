@@ -1,5 +1,5 @@
 nlp2>=1.8.4
-tfkit>=0.3.10
+tfkit>=0.5.6
 flask
 Flask-Caching
 flask-cors
