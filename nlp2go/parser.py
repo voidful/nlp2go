@@ -28,7 +28,13 @@ class Parser:
     def inputTfkitGeneralParser(self, input=""):
         return {'input': input}
 
-    def inputHFGeneralParser(self, input=""):
+    def inputHFGeneralParser(self, input="", **pred_arg):
+        return input
+
+    def inputHFGenerateParser(self, input="", **pred_arg):
+        for key, value in pred_arg.items():
+            if 'input' in key:
+                input += (tfkit.utility.tok.tok_sep(self.model.tokenizer) + value) if len(input) > 0 else value
         return input
 
     def inputTfkitQAParser(self, passage="", question=""):
@@ -61,20 +67,22 @@ class Parser:
     OUTPUT_PARSER_MAPPING = OrderedDict(
         [
             # Huggingface's model
+            ("question-answering", outputHFQAParser,),
             ("feature-extraction", outputHFGeneralParser,),
             ("sentiment-analysis", outputHFGeneralParser,),
             ("ner", outputHFGeneralParser,),
-            ("question-answering", outputHFQAParser,),
             ("fill-mask", outputHFGeneralParser,),
             ("summarization", outputHFGeneralParser,),
-            ("translation_en_to_fr", outputHFGeneralParser,),
-            ("translation_en_to_de", outputHFGeneralParser,),
-            ("translation_en_to_ro", outputHFGeneralParser,),
+            ("text2text-generation", outputHFGeneralParser,),
+            ("translation_xx_to_yy", outputHFGeneralParser,),
+            ("zero-shot-classification", outputHFGeneralParser,),
             ("text-generation", outputHFGeneralParser,),
+            ("conversational", outputHFGeneralParser,),
             # TFKIT model
             ("general", outputTfkitGeneralParser,),
         ]
     )
+
 
     INPUT_PARSER_MAPPING = OrderedDict(
         [
@@ -84,11 +92,12 @@ class Parser:
             ("ner", inputHFGeneralParser,),
             ("question-answering", inputHFQAParser,),
             ("fill-mask", inputHFGeneralParser,),
-            ("summarization", inputHFGeneralParser,),
-            ("translation_en_to_fr", inputHFGeneralParser,),
-            ("translation_en_to_de", inputHFGeneralParser,),
-            ("translation_en_to_ro", inputHFGeneralParser,),
-            ("text-generation", inputHFGeneralParser,),
+            ("summarization", inputHFGenerateParser,),
+            ("text2text-generation", inputHFGenerateParser,),
+            ("translation_xx_to_yy", inputHFGeneralParser,),
+            ("zero-shot-classification", inputHFGeneralParser,),
+            ("text-generation", inputHFGenerateParser,),
+            ("conversational", inputHFGeneralParser,),
             # TFKIT model
             ("qa", inputTfkitQAParser,),
             ("general", inputTfkitGeneralParser,),

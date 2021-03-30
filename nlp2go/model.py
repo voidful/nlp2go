@@ -1,6 +1,6 @@
 import nlp2
 import tfkit
-from transformers import pipeline, pipelines, BertTokenizer, cached_path
+from transformers import pipeline, pipelines, BertTokenizer, cached_path, AutoTokenizer
 
 from nlp2go.modelhub import MODELMAP
 from nlp2go.parser import Parser
@@ -29,7 +29,8 @@ class Model:
             panel.add_element('model_task', supported_type, "Select model task: ", default={})
             model_task = panel.get_result_dict()['model_task']
 
-        tok_conf = BertTokenizer.from_pretrained(model_path) if 'voidful/albert_chinese' in model_path else model_path
+        tok_conf = BertTokenizer.from_pretrained(
+            model_path) if 'voidful/albert_chinese' in model_path else AutoTokenizer.from_pretrained(model_path)
         nlp = pipeline(model_task, model=model_path,
                        tokenizer=tok_conf)
         predict_parameter = {}
@@ -37,7 +38,8 @@ class Model:
 
     def load_tfkit_model(self, model_path, model_pretrained=None, model_task=None, enable_arg_panel=False):
         model_path = MODELMAP[model_path] if model_path in MODELMAP else model_path
-        model, model_task, model_class = tfkit.utility.model_loader.load_trained_model(cached_path(model_path), model_pretrained, model_task)
+        model, model_task, model_class = tfkit.utility.model_loader.load_trained_model(cached_path(model_path),
+                                                                                       model_pretrained, model_task)
         predict_parameter = tfkit.utility.model_loader.load_predict_parameter(model, enable_arg_panel=enable_arg_panel)
         return model, predict_parameter, model_task
 
