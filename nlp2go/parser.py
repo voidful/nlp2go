@@ -1,105 +1,115 @@
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import nlp2
 import tfkit
 
 
 class Parser:
-    def __init__(self, model_type, model):
+    def __init__(self, model_type, model, tokenizer):
         self.model = model
-        input_mapping = self.INPUT_PARSER_MAPPING
-        output_mapping = self.OUTPUT_PARSER_MAPPING
-        self.input_parser = input_mapping[model_type] if model_type in input_mapping else input_mapping['general']
-        self.output_parser = output_mapping[model_type] if model_type in output_mapping else output_mapping['general']
+        self.tokenizer = tokenizer
+        im = self.INPUT_PARSER_MAPPING
+        om = self.OUTPUT_PARSER_MAPPING
+        self._input_parser = im[model_type] if model_type in im else im['general']
+        self._output_parser = om[model_type] if model_type in om else om['general']
 
-    def inputParser(self, argument={}, enable_arg_panel=False):
-        argument = nlp2.function_argument_panel(self.input_parser, inputted_arg=argument,
+    def input_parser(self, argument={}, enable_arg_panel=False):
+        argument = nlp2.function_argument_panel(self._input_parser, inputted_arg=argument,
                                                 disable_input_panel=(not enable_arg_panel))
         # error input check
-        miss = nlp2.function_check_missing_arg(self.input_parser, list(argument.keys()))
+        miss = nlp2.function_check_missing_arg(self._input_parser, list(argument.keys()))
         if len(miss) > 0:
-            return {"wrong": miss, "all": nlp2.function_get_all_arg(self.input_parser)}
+            return {"miss": miss, "all": nlp2.function_get_all_arg(self._input_parser)}
         else:
-            return self.input_parser(self, **argument)
+            return self._input_parser(self, **argument)
 
-    def outputParser(self, *outputs):
-        return self.output_parser(self, outputs)
+    def _input_general_parser(self, input="", **pred_arg):
+        input_dict = defaultdict(lambda: OrderedDict())
+        for k, v in list(pred_arg.items()):
+            if isinstance(v, dict):
+                input_dict[v.get('field', 'input')][v.get('order', 0)] = v.get('input')
+                pred_arg.pop(k)
+        for k, v in input_dict.items():
+            if k not in pred_arg:
+                pred_arg[k] = ""
+            pred_arg[k] += tfkit.utility.tok.tok_sep(self.tokenizer).join(v.values())
+        if "input" in pred_arg:
+            input = pred_arg["input"]
+            pred_arg.pop("input")
+        return input, pred_arg
 
-    # Specific Model Input Parser
-    def inputTfkitGeneralParser(self, input=""):
-        return {'input': input}
+    def _input_hf_fillmask_parser(self, input="", targets=None, top_k=5, **pred_arg):
+        param = {"targets": targets, "top_k": top_k}
+        param.update(pred_arg)
+        input, param = self._input_general_parser(input, **param)
+        return input, param
 
-    def inputHFGeneralParser(self, input="", **pred_arg):
-        return input
+    def _input_hf_qa_parser(self, context="", question="", **pred_arg):
+        param = {"context": context, "question": question}
+        param.update(pred_arg)
+        input, param = self._input_general_parser(**param)
+        return input, param
 
-    def inputHFGenerateParser(self, input="", **pred_arg):
-        for key, value in pred_arg.items():
-            if 'input' in key:
-                input += (tfkit.utility.tok.tok_sep(self.model.tokenizer) + value) if len(input) > 0 else value
-        return input
+    def _input_tfkit_qa_parser(self, passage="", question="", **pred_arg):
+        _, param = self._input_general_parser(**pred_arg)
+        if "passage" in param:
+            passage = param["passage"]
+            param.pop("passage", None)
+        if "question" in param:
+            question = param["question"]
+            param.pop("question", None)
+        sep = tfkit.utility.tok.tok_sep(self.tokenizer)
+        param['input'] = passage + sep + question
+        return param
 
-    def inputTfkitQAParser(self, passage="", question=""):
-        sep = tfkit.utility.tok.tok_sep(self.model.tokenizer)
-        return {'input': passage + sep + question}
+    def output_parser(self, outputs):
+        return self._output_parser(self, outputs)
 
-    def inputHFQAParser(self, passage="", question=""):
-        return {'context': passage, 'question': question}
-
-    # Specific Model Output Parser
-    def outputHFGeneralParser(self, result_list):
-        answer_list = []
-        for r in result_list:
-            answer_list.append(r)
-        return {'result': answer_list}
-
-    def outputTfkitGeneralParser(self, output):
-        (result_list, result_dict) = output[0]
+    def _outout_tfkit_parser(self, result_triple):
+        result, detail = result_triple
         return {
-            'result': result_list,
-            'result_info': result_dict
+            'result': result
         }
 
-    def outputHFQAParser(self, result_list):
-        answer_list = []
-        for r in result_list:
-            answer_list.append(r['answer'])
-        return {'result': answer_list, 'result_info': result_list}
+    def _outout_hf_parser(self, result):
+        return {
+            'result': result
+        }
 
     OUTPUT_PARSER_MAPPING = OrderedDict(
         [
             # Huggingface's model
-            ("question-answering", outputHFQAParser,),
-            ("feature-extraction", outputHFGeneralParser,),
-            ("sentiment-analysis", outputHFGeneralParser,),
-            ("ner", outputHFGeneralParser,),
-            ("fill-mask", outputHFGeneralParser,),
-            ("summarization", outputHFGeneralParser,),
-            ("text2text-generation", outputHFGeneralParser,),
-            ("translation_xx_to_yy", outputHFGeneralParser,),
-            ("zero-shot-classification", outputHFGeneralParser,),
-            ("text-generation", outputHFGeneralParser,),
-            ("conversational", outputHFGeneralParser,),
+            ("question-answering", _outout_hf_parser,),
+            ("feature-extraction", _outout_hf_parser,),
+            ("sentiment-analysis", _outout_hf_parser,),
+            ("ner", _outout_hf_parser,),
+            ("fill-mask", _outout_hf_parser,),
+            ("summarization", _outout_hf_parser,),
+            ("text2text-generation", _outout_hf_parser,),
+            ("translation_xx_to_yy", _outout_hf_parser,),
+            ("zero-shot-classification", _outout_hf_parser,),
+            ("text-generation", _outout_hf_parser,),
+            ("conversational", _outout_hf_parser,),
             # TFKIT model
-            ("general", outputTfkitGeneralParser,),
+            ("general", _outout_tfkit_parser,),
         ]
     )
-
 
     INPUT_PARSER_MAPPING = OrderedDict(
         [
             # Huggingface's model
-            ("feature-extraction", inputHFGeneralParser,),
-            ("sentiment-analysis", inputHFGeneralParser,),
-            ("ner", inputHFGeneralParser,),
-            ("question-answering", inputHFQAParser,),
-            ("fill-mask", inputHFGeneralParser,),
-            ("summarization", inputHFGenerateParser,),
-            ("text2text-generation", inputHFGenerateParser,),
-            ("translation_xx_to_yy", inputHFGeneralParser,),
-            ("zero-shot-classification", inputHFGeneralParser,),
-            ("text-generation", inputHFGenerateParser,),
-            ("conversational", inputHFGeneralParser,),
+            ("feature-extraction", _input_general_parser,),
+            ("sentiment-analysis", _input_general_parser,),
+            ("ner", _input_general_parser,),
+            ("question-answering", _input_hf_qa_parser,),
+            ("fill-mask", _input_hf_fillmask_parser,),
+            ("summarization", _input_general_parser,),
+            ("text2text-generation", _input_general_parser,),
+            ("translation_xx_to_yy", _input_general_parser,),
+            ("zero-shot-classification", _input_general_parser,),
+            ("text-generation", _input_general_parser,),
+            ("conversational", _input_general_parser,),
             # TFKIT model
-            ("qa", inputTfkitQAParser,),
-            ("general", inputTfkitGeneralParser,),
+            ("qa", _input_tfkit_qa_parser,),
+            ("general", _input_general_parser,),
         ]
     )

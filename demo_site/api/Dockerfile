@@ -8,11 +8,11 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 # Install Python dependencies
-RUN pip install gevent
+COPY requirements.txt /usr/src/app/requirements.txt
+RUN pip install -r requirements.txt
 
 # Copy source project
 COPY . /usr/src/app/
 
-RUN pip install nlprep tfkit nlp2go -U
 RUN nlp2go-preload --json config.json
 CMD PYTHONIOENCODING=utf8 nlp2go --json config.json --api_port ${PORT}

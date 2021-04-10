@@ -29,7 +29,8 @@
       {
         "name": "input",
         "type": "textarea",
-        "placeholder": "輸入文本"
+        "placeholder": "輸入文本",
+        "field": "input"
       }
     ],
     "example": [
@@ -49,6 +50,7 @@
     "name": "艾伯特測夢",
     "topP": 10,
     "topK": 0.6,
+    "decodenum": 3,
     "component": [
       {
         "name": "input",
@@ -75,11 +77,16 @@
       {
         "name": "passage",
         "type": "textarea",
-        "placeholder": "Passage"
-      },{
+        "placeholder": "Passage",
+        "field": "input",
+        "order": 0
+      },
+      {
         "name": "question",
         "type": "input",
-        "placeholder": "Question"
+        "placeholder": "Question",
+        "field": "input",
+        "order": 1
       }
     ],
     "example": [
@@ -103,11 +110,16 @@
       {
         "name": "passage",
         "type": "textarea",
-        "placeholder": "Passage"
-      },{
+        "placeholder": "Passage",
+        "field": "input",
+        "order": 0
+      },
+      {
         "name": "question",
         "type": "input",
-        "placeholder": "Question"
+        "placeholder": "Question",
+        "field": "input",
+        "order": 1
       }
     ],
     "example": [

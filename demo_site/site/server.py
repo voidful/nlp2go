@@ -25,10 +25,10 @@ class ServerError(Exception):
         return error_dict
 
 
-def make_app(static_dir: str = None) -> Flask:
+def make_app(static_dir: str = None, api_url: str = None) -> Flask:
     static_dir = os.path.abspath(static_dir)
     app = Flask(__name__, static_folder=static_dir)
-    api_url = os.environ["REACT_APP_API_URL"]
+    api_url = os.environ["REACT_APP_API_URL"] if "REACT_APP_API_URL" in os.environ else api_url
 
     @app.route('/')
     def index() -> Response:  # pylint: disable=unused-variable
@@ -46,7 +46,9 @@ def make_app(static_dir: str = None) -> Flask:
     def api():
         content = request.json
         task_id = request.args.get("id")
+        print("api requests: ", api_url + task_id, content)
         response = requests.post(url=api_url + task_id, json=content)
+        print("response", response.text)
         return jsonify(response.json())
 
     @app.route('/config', methods=['GET'])
@@ -66,11 +68,12 @@ def make_app(static_dir: str = None) -> Flask:
 
 def main(args):
     parser = argparse.ArgumentParser(description='Serve up a simple model')
-    parser.add_argument('--static-dir', default='./public', type=str, help='serve index.html from this directory')
+    parser.add_argument('--static', default='./public', type=str, help='serve index.html from this directory')
     parser.add_argument('--port', type=int, default=80, help='port to serve the demo on')
+    parser.add_argument('--api_url', type=str, default='http://localhost:8021/api/', help='nlp2go api url')
 
     args = parser.parse_args(args)
-    app = make_app(static_dir=args.static_dir)
+    app = make_app(static_dir=args.static, api_url=args.api_url)
     CORS(app)
 
     http_server = WSGIServer(('0.0.0.0', args.port), app)

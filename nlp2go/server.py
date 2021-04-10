@@ -41,9 +41,10 @@ class Server:
         @app.route('/api/<path>', methods=['POST'])
         @cache.cached(timeout=3600, key_prefix=make_cache_key)
         def predict(path) -> Response:
+            print("api request", path, request.json)
             if path in models:
-                result_dict = models[path].predict(request.json, enable_input_panel=False)
-                return Response(json.dumps({'result': result_dict['result']}, ensure_ascii=False, cls=NumpyEncoder,
+                result_dict = models[path].predict(request.json)
+                return Response(json.dumps(result_dict, ensure_ascii=False, cls=NumpyEncoder,
                                            indent=4,
                                            sort_keys=True))
             else:

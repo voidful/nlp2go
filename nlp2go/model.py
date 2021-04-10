@@ -8,58 +8,61 @@ from nlp2go.parser import Parser
 
 class Model:
 
-    def __init__(self, model_path, model_pretrained=None, model_task=None, enable_arg_panel=False):
+    def __init__(self, model_path, panel=False, **param):
         self.model = None
+        self.enable_panel = panel
         if nlp2.is_file_exist(model_path) or "tfkit_" in model_path:  # tfkit models
             self.lib = 'tfkit'
-            self.model, self.predict_parameter, self.model_task = self.load_tfkit_model(model_path, model_pretrained,
-                                                                                        model_task,
-                                                                                        enable_arg_panel)
+            self.model, self.predict_parameter, self.model_task = self.load_tfkit_model(model_path, **param)
+            self.predict_func = self.model.predict
         else:  # huggingface's transfromers model - local model saved in dir, online model name without tfkit tag
             self.lib = 'hf'
-            self.model, self.predict_parameter, self.model_task = self.load_huggingface_model(model_path,
-                                                                                              model_pretrained,
-                                                                                              model_task,
-                                                                                              enable_arg_panel)
+            self.model, self.predict_parameter, self.model_task = self.load_huggingface_model(model_path, **param)
+            self.predict_func = self.model
+        self.parser = Parser(self.model_task, self.predict_func, self.model.tokenizer)
 
-    def load_huggingface_model(self, model_path, model_pretrained=None, model_task=None, enable_arg_panel=False):
+    def load_huggingface_model(self, model_path, **param):
         supported_type = list(pipelines.SUPPORTED_TASKS.keys())
-        if model_task is None or model_task not in supported_type:
+        if 'task' not in param or param['task'] not in supported_type:
             panel = nlp2.Panel()
-            panel.add_element('model_task', supported_type, "Select model task: ", default={})
-            model_task = panel.get_result_dict()['model_task']
+            panel.add_element('task', supported_type, "Select model task: ", default={})
+            model_task = panel.get_result_dict()['task']
+        else:
+            model_task = param['task']
 
-        tok_conf = BertTokenizer.from_pretrained(
-            model_path) if 'voidful/albert_chinese' in model_path else AutoTokenizer.from_pretrained(model_path)
-        nlp = pipeline(model_task, model=model_path,
-                       tokenizer=tok_conf)
-        predict_parameter = {}
+        param['model'] = model_path
+        param['tokenizer'] = BertTokenizer.from_pretrained(model_path) if 'voidful/albert_chinese' in model_path \
+            else AutoTokenizer.from_pretrained(model_path)
+        pipeline_param, predict_parameter = nlp2.function_sep_suit_arg(pipeline, param)
+        nlp = pipeline(**pipeline_param)
         return nlp, predict_parameter, model_task
 
-    def load_tfkit_model(self, model_path, model_pretrained=None, model_task=None, enable_arg_panel=False):
+    def load_tfkit_model(self, model_path, **param):
+        model_task = param['task'] if 'task' in param else None
         model_path = MODELMAP[model_path] if model_path in MODELMAP else model_path
         model, model_task, model_class = tfkit.utility.model_loader.load_trained_model(cached_path(model_path),
-                                                                                       model_pretrained, model_task)
-        predict_parameter = tfkit.utility.model_loader.load_predict_parameter(model, enable_arg_panel=enable_arg_panel)
+                                                                                       model_type=model_task)
+        predict_parameter, _ = nlp2.function_sep_suit_arg(model.predict, param)
         return model, predict_parameter, model_task
 
-    def predict(self, argument={}, enable_input_panel=False):
-        parser = Parser(self.model_task, self.model)
-        input_argument = parser.inputParser(argument, enable_input_panel)
-        if "wrong" in input_argument:
+    def predict(self, pred_json=None, **argument):
+        pred_param = self.predict_parameter.copy()
+        pred_param.update(argument)
+        if pred_json:
+            if isinstance(pred_json, str):
+                pred_param.update({'input': pred_json})
+            else:
+                pred_param.update(pred_json)
+        input_argument = self.parser.input_parser(pred_param, enable_arg_panel=self.enable_panel)
+        try:
+            if isinstance(input_argument, tuple):
+                pred = self.predict_func(input_argument[0], **input_argument[1])
+            else:
+                pred = self.predict_func(**input_argument)
+            pred = self.parser.output_parser(pred)
+            return pred
+        except Exception as e:
             return {
-                'result': 'incorrect input:' + str(input_argument['wrong']) +
-                          ', Should be:' + str(input_argument["all"]),
-                'result_info': input_argument
+                "input": input_argument,
+                "error": str(e)
             }
-        else:
-            if self.lib == 'hf':
-                predict_func = self.model
-            else:
-                predict_func = self.model.predict
-
-            if isinstance(input_argument, str):
-                return parser.outputParser(predict_func(input_argument))
-            else:
-                self.predict_parameter.update(input_argument)
-                return parser.outputParser(predict_func(**self.predict_parameter))
