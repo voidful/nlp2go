@@ -1,4 +1,4 @@
-nlp2>=1.8.4
+nlp2>=1.8.31
 tfkit>=0.5.6
 flask
 Flask-Caching
