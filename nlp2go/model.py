@@ -1,3 +1,5 @@
+import inspect
+
 import nlp2
 import tfkit
 from transformers import pipeline, pipelines, BertTokenizer, cached_path, AutoTokenizer
@@ -20,6 +22,9 @@ class Model:
             self.model, self.predict_parameter, self.model_task = self.load_huggingface_model(model_path, **param)
             self.predict_func = self.model
         self.parser = Parser(self.model_task, self.predict_func, self.model.tokenizer)
+        predict_parameter, _ = nlp2.function_sep_suit_arg(self.parser.get_input_parser(), param)
+        self.predict_parameter.update(predict_parameter)
+        print("loaded model predict_parameter", predict_parameter)
 
     def load_huggingface_model(self, model_path, **param):
         supported_type = list(pipelines.SUPPORTED_TASKS.keys())
@@ -34,8 +39,8 @@ class Model:
         param['tokenizer'] = BertTokenizer.from_pretrained(model_path) if 'voidful/albert_chinese' in model_path \
             else AutoTokenizer.from_pretrained(model_path)
         pipeline_param, _ = nlp2.function_sep_suit_arg(pipeline, param)
-        predict_parameter, _ = nlp2.function_sep_suit_arg(pipeline.__call__, param)
         nlp = pipeline(**pipeline_param)
+        predict_parameter, _ = nlp2.function_sep_suit_arg(nlp, param)
         return nlp, predict_parameter, model_task
 
     def load_tfkit_model(self, model_path, **param):

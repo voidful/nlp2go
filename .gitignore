@@ -243,15 +243,6 @@ Temporary Items
 how2
 /how2
 
-# test cache
-./nlp2go/test/cache
-/nlp2go/test/cache
-nlp2go/test/cache
-
-/test
-./test
-test
-
 # dependencies
 /node_modules
 /.pnp
@@ -298,3 +289,4 @@ yarn-debug.log*
 yarn-error.log*
 
 /demo_site/site/package-lock.json
+/nlp2go/test/log/

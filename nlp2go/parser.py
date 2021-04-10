@@ -22,6 +22,9 @@ class Parser:
         else:
             return self._input_parser(self, **argument)
 
+    def get_input_parser(self):
+        return self._input_parser
+
     def _input_general_parser(self, input="", **pred_arg):
         input_dict = defaultdict(lambda: OrderedDict())
         for k, v in list(pred_arg.items()):
@@ -41,6 +44,14 @@ class Parser:
         param = {"targets": targets, "top_k": top_k}
         param.update(pred_arg)
         input, param = self._input_general_parser(input, **param)
+        return input, param
+
+    def _input_hf_generate_parser(self, input="", max_length=20, min_length=10, num_return_sequences=1, num_beams=1,
+                                  **pred_arg):
+        param = {"max_length": max_length, "min_length": min_length, "num_return_sequences": num_return_sequences,
+                 "num_beams": num_beams}
+        param.update(pred_arg)
+        input, param = self._input_general_parser(**param)
         return input, param
 
     def _input_hf_qa_parser(self, passage="", question="", **pred_arg):
@@ -102,12 +113,12 @@ class Parser:
             ("ner", _input_general_parser,),
             ("question-answering", _input_hf_qa_parser,),
             ("fill-mask", _input_hf_fillmask_parser,),
-            ("summarization", _input_general_parser,),
-            ("text2text-generation", _input_general_parser,),
+            ("summarization", _input_hf_generate_parser,),
+            ("text2text-generation", _input_hf_generate_parser,),
             ("translation_xx_to_yy", _input_general_parser,),
             ("zero-shot-classification", _input_general_parser,),
-            ("text-generation", _input_general_parser,),
-            ("conversational", _input_general_parser,),
+            ("text-generation", _input_hf_generate_parser,),
+            ("conversational", _input_hf_generate_parser,),
             # TFKIT model
             ("qa", _input_tfkit_qa_parser,),
             ("general", _input_general_parser,),

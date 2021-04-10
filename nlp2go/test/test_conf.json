@@ -1,6 +1,41 @@
 {
-    "albert_mask": {
-      "model": "voidful/albert_chinese_tiny",
-      "task": "fill-mask"
+    "dist-pm": {
+      "model": "patrickvonplaten/t5-tiny-random",
+      "description": "Distractor generator PM",
+      "name": "Distractor PM",
+      "task": "text2text-generation",
+      "num_beams": 3,
+      "num_return_sequences": 3,
+      "component": [
+        {
+            "name": "dpm_c",
+            "type": "textarea",
+            "placeholder": "passage",
+            "field":"input",
+            "order": 0
+          },
+          {
+            "name": "dpm_q",
+            "type": "input",
+            "placeholder": "question",
+            "field":"input",
+            "order": 1
+          },
+          {
+            "name": "dpm_a",
+            "type": "input",
+            "placeholder": "answer",
+            "field":"input",
+            "order": 2
+          }
+      ],
+      "example": [
+        {
+          "dpm_c": "When you ' re having a holiday , one of the main questions to ask is which hotel or apartment to choose . However , when it comes to France , you have another special choice : treehouses . In France , treehouses are offered to travelers as a new choice in many places . The price may be a little higher , but you do have a chance to _ your childhood memories . Alain Laurens , one of France ' s top treehouse designers , said , ' Most of the people might have the experience of building a den when they were young . And they like that feeling of freedom when they are children . ' Its fairy - tale style gives travelers a special feeling . It seems as if they are living as a forest king and enjoying the fresh air in the morning . Another kind of treehouse is the ' star cube ' . It gives travelers the chance of looking at the stars shining in the sky when they are going to sleep . Each ' star cube ' not only offers all the comfortable things that a hotel provides for travelers , but also gives them a chance to look for stars by using a telescope . The glass roof allows you to look at the stars from your bed .",
+          "dpm_q": "The passage mainly tells us",
+          "dpm_a": "treehouses in france.",
+          "name": "Holiday"
+        }
+      ]
     }
 }
