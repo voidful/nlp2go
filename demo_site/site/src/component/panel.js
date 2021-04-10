@@ -10,8 +10,9 @@ class PANEL extends React.Component {
             new_state[this.state.id + 'result'] = ''
             this.setState(new_state)
             let input_dict = {}
-            this.state.component_list.map((name, index) => {
-                input_dict[name] = this.state[this.state.id + name]
+            this.state.component.map((component) => {
+                component['input'] = this.state[this.state.id + component['name']]
+                input_dict[component['name']] = component
                 return null
             })
             fetch(window.location.origin + "/api?id=" + this.state.id, {
@@ -51,17 +52,12 @@ class PANEL extends React.Component {
 
     static getDerivedStateFromProps(props, state) {
         let {id, name, description, component, example} = props
-        let component_list = []
-        component.map((item_dict, index) => (
-            component_list.push(item_dict["name"])
-        ))
         let state_dict = {
             id: id,
             name: name,
             description: description,
             component: component,
             example: example,
-            component_list: component_list,
             loading: state.loading
         }
         state_dict[id + "result"] = state[id + "result"]
@@ -102,21 +98,21 @@ class PANEL extends React.Component {
                         ))}
                     </select>
                     <br/>
-                    {this.state.component.map((item_dict, index) => (
-                        <div key={index}>
+                    {this.state.component.map((component) => (
+                        <div key={component['name']}>
                             {(() => {
-                                switch (item_dict["type"]) {
+                                switch (component["type"]) {
                                     case "textarea":
-                                        return <textarea name={this.state.id + item_dict["name"]}
-                                                         placeholder={item_dict["placeholder"]}
-                                                         value={this.state[this.state.id + item_dict["name"]] === undefined ? "" : this.state[this.state.id + item_dict["name"]]}
+                                        return <textarea name={this.state.id + component['name']}
+                                                         placeholder={component["placeholder"]}
+                                                         value={this.state[this.state.id + component['name']] === undefined ? "" : this.state[this.state.id + component['name']]}
                                                          onChange={this.handleInputChange}
                                                          rows="6">
                                                     </textarea>
                                     case "input":
-                                        return <input name={this.state.id + item_dict["name"]}
-                                                      placeholder={item_dict["placeholder"]}
-                                                      value={this.state[this.state.id + item_dict["name"]] === undefined ? "" : this.state[this.state.id + item_dict["name"]]}
+                                        return <input name={this.state.id + component['name']}
+                                                      placeholder={component["placeholder"]}
+                                                      value={this.state[this.state.id + component['name']] === undefined ? "" : this.state[this.state.id + component['name']]}
                                                       type="text"
                                                       onChange={this.handleInputChange}/>
                                     default:

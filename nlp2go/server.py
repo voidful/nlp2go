@@ -43,19 +43,24 @@ class Server:
         def predict(path) -> Response:
             print("api request", path, request.json)
             if path in models:
-                result_dict = models[path].predict(request.json)
-                return Response(json.dumps(result_dict, ensure_ascii=False, cls=NumpyEncoder,
+                pred_json = {}
+                for k, v in request.json.items():
+                    pred_json[k + "_component"] = v
+                result_dict = models[path].predict(pred_json)
+                response_json = json.dumps(result_dict, ensure_ascii=False, cls=NumpyEncoder,
                                            indent=4,
-                                           sort_keys=True))
+                                           sort_keys=True)
+                return Response(response_json)
             else:
                 raise self.ServerError("parameter not found", 404)
 
         @app.route('/api/config', methods=['GET'])
         def config() -> Response:
             try:
-                return Response(json.dumps(model_detail, ensure_ascii=False, cls=NumpyEncoder,
+                response_json = json.dumps(model_detail, ensure_ascii=False, cls=NumpyEncoder,
                                            indent=4,
-                                           sort_keys=True))
+                                           sort_keys=True)
+                return Response(response_json)
             except:
                 raise self.ServerError("parameter not found", 404)
 

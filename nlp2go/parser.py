@@ -43,8 +43,8 @@ class Parser:
         input, param = self._input_general_parser(input, **param)
         return input, param
 
-    def _input_hf_qa_parser(self, context="", question="", **pred_arg):
-        param = {"context": context, "question": question}
+    def _input_hf_qa_parser(self, passage="", question="", **pred_arg):
+        param = {"context": passage, "question": question}
         param.update(pred_arg)
         input, param = self._input_general_parser(**param)
         return input, param
