@@ -33,7 +33,8 @@ class Model:
         param['model'] = model_path
         param['tokenizer'] = BertTokenizer.from_pretrained(model_path) if 'voidful/albert_chinese' in model_path \
             else AutoTokenizer.from_pretrained(model_path)
-        pipeline_param, predict_parameter = nlp2.function_sep_suit_arg(pipeline, param)
+        pipeline_param, _ = nlp2.function_sep_suit_arg(pipeline, param)
+        predict_parameter, _ = nlp2.function_sep_suit_arg(pipeline.__call__, param)
         nlp = pipeline(**pipeline_param)
         return nlp, predict_parameter, model_task
 
