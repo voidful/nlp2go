@@ -37,7 +37,7 @@ def main(arg=None):
     args, others_arg = parse_args(arg)
     loaded_model = {}
     if args.get('model', None):
-        loaded_model[args.api_path] = Model(args.model, args.panel, others_arg)
+        loaded_model[args.get('api_path')] = Model(args.get('model'), args.get('panel', False), **others_arg)
     else:
         with open(args.get('json'), 'r', encoding='utf8') as reader:
             model_dict = json.loads(reader.read())
