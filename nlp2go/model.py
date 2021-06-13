@@ -47,8 +47,9 @@ class Model:
         model_task = param['task'] if 'task' in param else None
         model_path = MODELMAP[model_path] if model_path in MODELMAP else model_path
         model, model_task, model_class = tfkit.utility.model_loader.load_trained_model(cached_path(model_path),
-                                                                                       model_type=model_task)
+                                                                                       tag=model_task)
         predict_parameter, _ = nlp2.function_sep_suit_arg(model.predict, param)
+        model.eval()
         return model, predict_parameter, model_task
 
     def predict(self, pred_json=None, **argument):
