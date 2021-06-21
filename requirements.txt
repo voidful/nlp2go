@@ -5,4 +5,4 @@ Flask-Caching
 flask-cors
 gevent
 inquirer
-transformers==3.3.0
+transformers>=3.3.0
