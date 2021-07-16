@@ -21,7 +21,7 @@ class TestModel(unittest.TestCase):
     def test_predict_hf(self):
         supported_type = list(pipelines.SUPPORTED_TASKS.keys())
         ignoree_type = ['table-question-answering', 'summarization', 'translation', 'text2text-generation',
-                        'text-generation', 'conversational']
+                        'text-generation', 'conversational', 'image-classification']
         for task in supported_type:
             print(task)
             if task not in ignoree_type:
