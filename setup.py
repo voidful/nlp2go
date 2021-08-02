@@ -6,7 +6,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='nlp2go',
-    version='0.4.13',
+    version='0.4.14',
     description='hosting nlp models for demo purpose',
     url='https://github.com/voidful/nlp2go',
     author='Voidful',
