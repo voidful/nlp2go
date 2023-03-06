@@ -16,7 +16,8 @@ RUN pip3 install -r /usr/src/app/requirements.txt
 # Copy source project
 COPY . /usr/src/app/
 
-RUN npm install
-RUN npm run build
+RUN npm install --global yarn
+RUN yarn install
+RUN yarn build
 
 CMD python3 server.py --port 80 --static ./build

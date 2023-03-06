@@ -3070,20 +3070,16 @@ button:disabled,
     padding: 2.22222em 2.22222em 2.44444em 2.22222em;
     position: relative;
     width: 26em;
+    height: 100%;
 }
 
 #sidebar > .inner > * {
     padding: 0 0 2em 0;
 }
 
-#sidebar > .inner > * > :last-child {
-    margin-bottom: 0;
-}
 
 #sidebar > .inner > *:last-child {
     border-bottom: 0;
-    margin-bottom: 0;
-    padding-bottom: 0;
 }
 
 #sidebar > .inner > .alt {
@@ -3407,6 +3403,8 @@ button:disabled,
 
 /* Footer */
 #footer .copyright {
+    position: absolute;
+    bottom: 0;
     color: #9fa3a6;
     font-size: 0.9em;
 }

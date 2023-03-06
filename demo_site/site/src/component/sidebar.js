@@ -31,19 +31,19 @@ class Sidebar extends React.Component {
                         </ul>
                     </nav>
 
-                    <nav className="menu">
-                        <header className="major">
-                            <h2>Reference</h2>
-                        </header>
-                        <ul>
-                            <li><a href="https://github.com/voidful/NLPrep" target="_blank"
-                                   rel="noopener noreferrer">nlprep</a></li>
-                            <li><a href="https://github.com/voidful/TFkit" target="_blank"
-                                   rel="noopener noreferrer">tfkit</a></li>
-                            <li><a href="https://github.com/voidful/nlp2go" target="_blank"
-                                   rel="noopener noreferrer">nlp2go</a></li>
-                        </ul>
-                    </nav>
+                    {/*<nav className="menu">*/}
+                    {/*    <header className="major">*/}
+                    {/*        <h2>Reference</h2>*/}
+                    {/*    </header>*/}
+                    {/*    <ul>*/}
+                    {/*        <li><a href="https://github.com/voidful/NLPrep" target="_blank"*/}
+                    {/*               rel="noopener noreferrer">nlprep</a></li>*/}
+                    {/*        <li><a href="https://github.com/voidful/TFkit" target="_blank"*/}
+                    {/*               rel="noopener noreferrer">tfkit</a></li>*/}
+                    {/*        <li><a href="https://github.com/voidful/nlp2go" target="_blank"*/}
+                    {/*               rel="noopener noreferrer">nlp2go</a></li>*/}
+                    {/*    </ul>*/}
+                    {/*</nav>*/}
 
                     <footer id="footer">
                         <p className="copyright">&copy; Voidful. All rights reserved. <br/>
