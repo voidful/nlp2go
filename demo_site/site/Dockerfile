@@ -2,7 +2,7 @@ FROM python:3.6-stretch
 
 # nodejs
 RUN apt-get -y update
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_19.x | sudo -E bash -
 RUN apt install nodejs
 
 # Create app directory
