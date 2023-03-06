@@ -39,7 +39,7 @@ class Server:
             return str(request.json) + str(request.full_path)
 
         @app.route('/api/<path>', methods=['POST'])
-        @cache.cached(timeout=3600, key_prefix=make_cache_key)
+        @cache.cached(timeout=20, key_prefix=make_cache_key)
         def predict(path) -> Response:
             print("api request", path, request.json)
             if path in models:

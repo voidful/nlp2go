@@ -1,9 +1,9 @@
-FROM python:3.6-stretch
+FROM python:3.9.16
 
 # nodejs
 RUN apt-get -y update
 RUN curl -fsSL https://deb.nodesource.com/setup_19.x | bash -
-RUN apt install nodejs
+RUN apt install -y nodejs
 
 # Create app directory
 RUN mkdir -p /usr/src/app
